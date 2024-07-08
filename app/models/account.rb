@@ -5,4 +5,10 @@ class Account < ApplicationRecord
   belongs_to :user
   
   enum account_type: %w[cash person bank].index_by(&:itself)
+  
+  def transactions
+    Transaction.where(source_account_id: self.id).or(
+      Transaction.where(destination_account_id: self.id)
+    )
+  end
 end
