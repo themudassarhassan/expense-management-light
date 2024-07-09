@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>ExpenseManagementLight</title>
+    <title>Expense Management</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -11,9 +11,30 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <main class="container mx-auto mt-28 px-5 flex">
+   <body class="bg-gray-100 h-screen antialiased leading-none">
+
+    <header class="bg-blue-500 text-white shadow">
+      <div class="container mx-auto flex justify-between items-center px-6 py-3">
+        <div>
+          <a href="/" class="font-bold text-lg">
+            Expense Management
+          </a>
+        </div>
+        <nav class="space-x-4 text-sm sm:text-base">
+          <a href="#" class="no-underline hover:underline">New Transaction</a>
+          <a href="#" class="no-underline hover:underline">Add Account</a>
+          <a href="#" class="no-underline hover:underline">Add Budget</a>
+          <%= link_to 'Logout', sessions_path, data: { turbo_method: :delete}, class: "no-underline hover:underline" %>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container mx-auto mt-10">
       <%= yield %>
     </main>
+    
+    <footer class="bg-blue-500 text-white text-center py-4">
+      &copy; 2023 Your Company
+    </footer>
   </body>
 </html>
