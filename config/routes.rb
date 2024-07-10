@@ -10,4 +10,6 @@ Rails.application.routes.draw do
   
   resource :registrations, only: [:new, :create]
   resource :sessions, only: [:new, :create, :destroy]
+  
+  resources :accounts
 end

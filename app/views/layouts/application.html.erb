@@ -22,7 +22,7 @@
         </div>
         <nav class="space-x-4 text-sm sm:text-base">
           <a href="#" class="no-underline hover:underline">New Transaction</a>
-          <a href="#" class="no-underline hover:underline">Add Account</a>
+          <%= link_to 'Add Account', new_account_path, class: "no-underline hover:underline"%>
           <a href="#" class="no-underline hover:underline">Add Budget</a>
           <%= link_to 'Logout', sessions_path, data: { turbo_method: :delete}, class: "no-underline hover:underline" %>
         </nav>
