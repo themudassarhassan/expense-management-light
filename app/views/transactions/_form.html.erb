@@ -1,0 +1,58 @@
+<%= form_with model: @transaction.becomes(Transaction), local: true, class: "bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4", data: { controller: 'transactions' } do |form| %>
+    
+    <% if @transaction.errors.any? %>
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+        <strong class="font-bold">Oops!</strong>
+        <span class="block sm:inline">There were some problems with your input:</span>
+        <ul class="mt-2 list-disc list-inside text-sm text-red-600">
+          <% @transaction.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="mb-4">
+      <%= form.label :amount, class: "block text-gray-700 text-sm font-bold mb-2" %>
+      <%= form.number_field :amount, step: :any, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+    </div>
+
+    <div class="mb-4">
+      <span class="block text-gray-700 text-sm font-bold mb-2">Transaction Type</span>
+      <div class="flex items-center">
+        <%= form.radio_button :type, 'Transactions::Expense', class: "mr-2 leading-tight" %>
+        <%= form.label :type_expense, 'Expense', class: "mr-4 text-gray-700" %>
+
+        <%= form.radio_button :type, 'Transactions::Income', class: "mr-2 leading-tight" %>
+        <%= form.label :type_income, 'Income', class: "mr-4 text-gray-700" %>
+
+        <%= form.radio_button :type, 'Transactions::Transfer', class: "mr-2 leading-tight" %>
+        <%= form.label :type_transfer, 'Transfer', class: "mr-4 text-gray-700" %>
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <%= form.label :source_account_id, "Source Account", class: "block text-gray-700 text-sm font-bold mb-2" %>
+      <%= form.collection_select :source_account_id, @accounts, :id, :name, prompt: 'Select Source Account', class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+    </div>
+
+    <div class="mb-4">
+      <%= form.label :destination_account_id, "Destination Account", class: "block text-gray-700 text-sm font-bold mb-2" %>
+      <%= form.collection_select :destination_account_id, @accounts, :id, :name, prompt: 'Select Destination Account', class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+    </div>
+
+    <div class="mb-4">
+      <%= form.label :category_id, "Category", class: "block text-gray-700 text-sm font-bold mb-2" %>
+      <%= form.collection_select :category_id, @categories, :id, :name, prompt: 'Select Category', class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+    </div>
+
+    <div class="mb-6">
+      <%= form.label :description, class: "block text-gray-700 text-sm font-bold mb-2" %>
+      <%= form.text_area :description, rows: 3, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+    </div>
+
+    <div class="flex items-center justify-between">
+      <%= form.submit class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" %>
+    </div>
+
+  <% end %>

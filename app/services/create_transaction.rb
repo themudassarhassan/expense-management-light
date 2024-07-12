@@ -5,7 +5,7 @@ class CreateTransaction
 
   def initialize(user:, amount:, type:, source_account_id: nil, destination_account_id: nil, category_id: nil, description: nil)
     @user = user
-    @amount = amount
+    @amount = amount.to_i
     @type = type
     @source_account_id = source_account_id
     @destination_account_id = destination_account_id
@@ -17,7 +17,7 @@ class CreateTransaction
     ActiveRecord::Base.transaction do
       source_account&.update!(balance: source_account.balance - amount)
       destination_account&.update!(balance: destination_account.balance + amount)
-      transaction_class.create!(transaction_params)
+      Transaction.create(transaction_params)
     end
   end
 
@@ -36,7 +36,7 @@ class CreateTransaction
   end
   
   def transaction_params
-    {user:, amount:, source_account_id:, destination_account_id:, description:, category_id:}.compact
+    {user:, amount:, source_account_id:, destination_account_id:, description:, category_id:, type:}.compact
   end
   
   def source_account

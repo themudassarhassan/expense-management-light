@@ -11,6 +11,7 @@ class UpdateTransaction
       revert_amount_of_previous_accounts
       transaction.update!(transaction_params)
       adjust_amount_of_current_accounts
+      transaction
     end  
   end
   
@@ -23,7 +24,7 @@ class UpdateTransaction
   
   def revert_amount_of_previous_accounts
     if ['Transactions::Expense', 'Transactions::Transfer'].include?(transaction.type)
-      transaction.source_account.update!(balance:transaction.source_account.balance + transaction.amount)
+      transaction.source_account.update!(balance: transaction.source_account.balance + transaction.amount)
     end
     
     if ['Transactions::Income', 'Transactions::Transfer'].include?(transaction.type)

@@ -3,4 +3,10 @@ class Transaction < ApplicationRecord
   validates :type, presence: true
  
   belongs_to :user
+  
+  def account_name
+    return "#{source_account.name} > #{destination_account.name}" if type == 'Transactions::Transfer'
+    
+    account.name
+  end
 end
