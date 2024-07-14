@@ -27,7 +27,7 @@ class AccountsController < ApplicationController
     if @account.update(account_params)
       redirect_to accounts_path
     else
-      render :edit, status, :unprocessable_entity
+      render :edit, status: :unprocessable_entity
     end
   end
   

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_07_01_095151) do
+ActiveRecord::Schema[7.1].define(version: 2024_07_12_152352) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -20,7 +20,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_01_095151) do
   create_enum "category_types", ["expense", "income"]
 
   create_table "accounts", force: :cascade do |t|
-    t.string "name"
+    t.string "name", null: false
     t.integer "balance", default: 0, null: false
     t.enum "account_type", null: false, enum_type: "account_types"
     t.datetime "created_at", null: false
