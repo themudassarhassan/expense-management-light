@@ -1,0 +1,28 @@
+<div class="max-w-4xl mx-auto mt-10">
+  <h1 class="text-2xl font-bold mb-5 text-center">Your Budgets</h1>
+
+  <% if @budgets.any? %>
+    <table class="min-w-full bg-white shadow-md rounded">
+      <thead>
+        <tr>
+          <th class="py-2 px-4 bg-gray-200 border-b">Month</th>
+          <th class="py-2 px-4 bg-gray-200 border-b">Budget Amount</th>
+          <th class="py-2 px-4 bg-gray-200 border-b">Category</th>
+          <th class="py-2 px-4 bg-gray-200 border-b">Spent Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @budgets.each do |budget| %>
+          <tr>
+            <td class="py-2 px-4 text-center border-b"><%= budget.budget_month.strftime("%B %Y") %></td>
+            <td class="py-2 px-4 text-center border-b"><%= number_with_delimiter(budget.amount) %></td>
+            <td class="py-2 px-4 text-center border-b capitalize"><%= budget.category.name %></td>
+            <td class="py-2 px-4 text-center border-b"><%= number_with_delimiter(budget.spent_amount) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <p class="text-center text-gray-600 mt-5">You have no budgets. <%= link_to 'Create one', new_budget_path, class: "text-blue-500 underline" %></p>
+  <% end %>
+</div>

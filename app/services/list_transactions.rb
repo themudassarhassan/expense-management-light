@@ -1,12 +1,14 @@
 class ListTransactions
   
-  attr_reader :page, :per_page, :user_id, :category_id
+  attr_reader :page, :per_page, :user_id, :category_id, :source_account_id, :destination_account_id
 
-  def initialize(page: 1, per_page: 50, user_id:, category_id: nil)
+  def initialize(page: 1, per_page: 50, user_id:, category_id: nil, source_account_id: nil, destination_account_id: nil)
     @page = page
     @per_page = per_page
     @user_id = user_id
     @category_id = category_id
+    @source_account_id = source_account_id
+    @destination_account_id = destination_account_id
   end
   
   def call
@@ -18,7 +20,9 @@ class ListTransactions
   def search_params
     {
       user_id:,
-      category_id:
+      category_id:,
+      source_account_id:,
+      destination_account_id:
     }.compact
   end
   

@@ -4,6 +4,9 @@ class Transaction < ApplicationRecord
  
   belongs_to :user
   
+  # TODO: any other way to do this?
+  scope :within, ->(start_date, end_date) { where(created_at: start_date..end_date) }
+
   def account_name
     return "#{source_account.name} > #{destination_account.name}" if type == 'Transactions::Transfer'
     
