@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateCategories < ActiveRecord::Migration[7.1]
   def up
     create_enum :category_types, %w[expense income]
@@ -8,10 +10,10 @@ class CreateCategories < ActiveRecord::Migration[7.1]
       t.timestamps
     end
   end
-  
+
   def down
     drop_table :categories
-    
+
     execute <<-SQL.squish
       DROP TYPE category_types;
     SQL

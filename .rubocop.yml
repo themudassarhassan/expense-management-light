@@ -1,0 +1,15 @@
+require:
+  - rubocop-rails
+
+Style/Documentation:
+  Enabled: false
+  
+AllCops:
+  CacheRootDirectory: tmp/rubocop_cache
+  NewCops: enable
+  DisplayCopNames: true
+  TargetRubyVersion: 3.2.2
+  
+Metrics/BlockLength:
+  Exclude: 
+    - config/environments/development.rb

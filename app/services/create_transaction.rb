@@ -1,9 +1,13 @@
-class CreateTransaction 
+# frozen_string_literal: true
+
+class CreateTransaction
   class UnknownTransactionTypeError < StandardError; end
- 
+
   attr_reader :user, :amount, :type, :source_account_id, :destination_account_id, :category_id, :description
 
-  def initialize(user:, amount:, type:, source_account_id: nil, destination_account_id: nil, category_id: nil, description: nil)
+  # rubocop:disable Metrics/ParameterLists
+  def initialize(user:, amount:, type:, source_account_id: nil, destination_account_id: nil, category_id: nil,
+                 description: nil)
     @user = user
     @amount = amount.to_i
     @type = type
@@ -12,6 +16,7 @@ class CreateTransaction
     @category_id = category_id
     @description = description
   end
+  # rubocop:enable Metrics/ParameterLists
 
   def call
     ActiveRecord::Base.transaction do
@@ -22,27 +27,27 @@ class CreateTransaction
   end
 
   private
-  
+
   def transaction_class
-    transactions_classes = { 
+    transactions_classes = {
       'transfer' => Transactions::Transfer,
       'income' => Transactions::Income,
       'expense' => Transactions::Expense
     }
-    
+
     raise UnknownTransactionTypeError if transactions_classes[type].nil?
-    
+
     transactions_classes[type]
   end
-  
+
   def transaction_params
-    {user:, amount:, source_account_id:, destination_account_id:, description:, category_id:, type:}.compact
+    { user:, amount:, source_account_id:, destination_account_id:, description:, category_id:, type: }.compact
   end
-  
+
   def source_account
     @source_account ||= Account.find_by(id: source_account_id)
   end
-  
+
   def destination_account
     @destination_account ||= Account.find_by(id: destination_account_id)
   end
