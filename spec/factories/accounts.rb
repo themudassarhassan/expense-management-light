@@ -5,6 +5,6 @@ FactoryBot.define do
     name { 'My bank account' }
     account_type { 'bank' }
     balance { 20 }
-    association :user
+    user
   end
 end

@@ -13,3 +13,5 @@ AllCops:
 Metrics/BlockLength:
   Exclude: 
     - config/environments/development.rb
+    # Specs has long blocks
+    - "**/*_spec.rb"

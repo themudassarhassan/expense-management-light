@@ -33,9 +33,9 @@ RSpec.describe CreateTransaction do
                                                                                       }.by(amount)
 
         expect(create_transaction).to have_attributes(amount: 100, source_account_id: source_account.id,
-                                                                   destination_account_id: destination_account.id,
-                                                                  description: 'Transaction description',
-                                                                  user_id: user.id)
+                                                      destination_account_id: destination_account.id,
+                                                      description: 'Transaction description',
+                                                      user_id: user.id)
       end
     end
 
