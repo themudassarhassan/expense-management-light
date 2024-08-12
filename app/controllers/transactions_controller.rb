@@ -20,7 +20,7 @@ class TransactionsController < ApplicationController
   def edit; end
 
   def create
-    @transaction = CreateTransaction.new(user: current_user, **transaction_params).call
+    @transaction = CreateTransaction.new(user_id: current_user.id, **transaction_params).call
 
     if @transaction.persisted?
       redirect_to transactions_path

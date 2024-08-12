@@ -56,6 +56,12 @@ group :development, :test do
   # Code quality checks
   gem 'rubocop', require: false
   gem 'rubocop-rails', require: false
+
+  # Easily get records by using factories in specs
+  gem 'factory_bot_rails'
+
+  # Unit Testing
+  gem 'rspec-rails'
 end
 
 group :development do
