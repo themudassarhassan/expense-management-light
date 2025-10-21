@@ -9,6 +9,8 @@ class Transaction < ApplicationRecord
   belongs_to :source_account, class_name: 'Account', optional: true
   belongs_to :destination_account, class_name: 'Account', optional: true
 
+  after_initialize :set_defaults, if: :new_record?
+
   # TODO: any other way to do this?
   scope :within, ->(start_date, end_date) { where(created_at: start_date..end_date) }
 
@@ -16,5 +18,11 @@ class Transaction < ApplicationRecord
     return "#{source_account.name} > #{destination_account.name}" if type == 'Transactions::Transfer'
 
     account.name
+  end
+
+  private
+
+  def set_defaults
+    self.type ||= 'Transactions::Expense'
   end
 end

@@ -3,6 +3,5 @@
   <div class="my-2">
     <%= link_to 'All Transactions', transactions_path%>
   </div>
-  
-  <%= render "form" %>
+  <%= render "form", transaction: @transaction %>
 </div>

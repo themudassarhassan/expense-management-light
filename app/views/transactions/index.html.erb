@@ -1,11 +1,9 @@
 <div class="max-w-3xl mx-auto mt-10">
   <h1 class="text-2xl font-bold mb-5 text-center">Your Transactions</h1>
-
   <% if @transactions.any? %>
     <table class="min-w-full bg-white shadow-md rounded">
       <thead>
         <tr>
-          
           <th class="py-2 px-4 bg-gray-200 border-b">ID</th>
           <th class="py-2 px-4 bg-gray-200 border-b">Transaction Type</th>
           <th class="py-2 px-4 bg-gray-200 border-b">Account</th>
@@ -23,7 +21,7 @@
             <td class="py-2 px-4 border-b"><%= transaction.account_name %></td>
             <td class="py-2 px-4 border-b"><%= number_with_delimiter(transaction.amount) %></td>
             <td class="py-2 px-4 border-b"><%= transaction.category&.name %></td>
-            <td class="py-2 px-4 border-b"><%= transaction.created_at.strftime("%Y-%m-%d") %></td>
+            <td class="py-2 px-4 border-b"><%= transaction.transaction_date.strftime("%Y-%m-%d") %></td>
             <td class="py-2 px-4 border-b" data-turbo-prefetch="false">
               <%= link_to 'Edit', edit_transaction_path(transaction), class: "inline-block bg-yellow-300 hover:bg-yellow-400 text-yellow-900 font-bold py-1 px-2 rounded mr-2" %>
               <%= link_to 'Delete', transaction_path(transaction), data: {turbo_method: :delete, turbo_confirm: 'Are you sure?'}, class: "inline-block bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded" %>

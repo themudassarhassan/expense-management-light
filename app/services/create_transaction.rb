@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 class CreateTransaction
-  attr_reader :user_id, :amount, :type, :source_account_id, :destination_account_id, :category_id, :description
+  attr_reader :user_id, :amount, :type, :source_account_id, :destination_account_id, :category_id, :description,
+              :transaction_date
 
   def initialize(**params)
     @user_id = params[:user_id]
@@ -11,6 +12,7 @@ class CreateTransaction
     @destination_account_id = params[:destination_account_id]
     @category_id = params[:category_id]
     @description = params[:description]
+    @transaction_date = params[:transaction_date]
   end
 
   def call
@@ -25,7 +27,8 @@ class CreateTransaction
   private
 
   def transaction_params
-    { user_id:, amount:, source_account_id:, destination_account_id:, description:, category_id:, type: }.compact
+    { user_id:, amount:, source_account_id:, destination_account_id:, description:, category_id:, type:,
+      transaction_date: }.compact
   end
 
   def source_account

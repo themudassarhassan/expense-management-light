@@ -14,7 +14,7 @@ class TransactionsController < ApplicationController
   end
 
   def new
-    @transaction = Transaction.new
+    @transaction = Transaction.new(params.permit(:type))
   end
 
   def edit; end
@@ -50,7 +50,8 @@ class TransactionsController < ApplicationController
   end
 
   def load_categories
-    @categories = Category.all
+    @expense_categories = Category.where(category_type: :expense)
+    @income_categories = Category.where(category_type: :income)
   end
 
   def load_user_accounts
@@ -59,7 +60,7 @@ class TransactionsController < ApplicationController
 
   def transaction_params
     params.require(:transaction).permit(
-      :amount, :description, :source_account_id, :destination_account_id, :type, :category_id
+      :amount, :description, :source_account_id, :destination_account_id, :type, :category_id, :transaction_date
     ).to_h.deep_symbolize_keys
   end
 end
