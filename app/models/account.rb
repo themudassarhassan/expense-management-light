@@ -1,16 +1,14 @@
 # frozen_string_literal: true
 
 class Account < ApplicationRecord
-  validates :balance, presence: true, numericality: { greater_than_or_equal_to: 0 }
-  validates :account_type, :name, presence: true
+  TYPES = %w[cash person bank expense income].freeze
 
-  belongs_to :user
+  validates :initial_balance, numericality: { greater_than_or_equal_to: 0 }
+  validates :name, presence: true
+  validates :account_type, inclusion: { in: TYPES }
+  validates :user_id, presence: true, unless: :system_generated
 
-  enum account_type: %w[cash person bank].index_by(&:itself)
+  belongs_to :user, optional: true
 
-  def transactions
-    Transaction.where(source_account_id: id).or(
-      Transaction.where(destination_account_id: id)
-    )
-  end
+  enum account_type: TYPES.index_by(&:itself)
 end

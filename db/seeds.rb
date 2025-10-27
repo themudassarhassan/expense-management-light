@@ -9,3 +9,14 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
+
+expense_accounts = %w[Food Mobile Fuel Home Travel]
+income_accounts = %w[Salary Investment Rent]
+
+expense_accounts.each do |account_name|
+  Account.create!(name: account_name, account_type: :expense, system_generated: true)
+end
+
+income_accounts.each do |account_name|
+  Account.create!(name: account_name, account_type: :income, system_generated: true)
+end

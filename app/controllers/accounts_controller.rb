@@ -35,7 +35,7 @@ class AccountsController < ApplicationController
   def destroy
     @account.destroy
 
-    head :ok
+    redirect_to accounts_path
   end
 
   private
@@ -45,6 +45,6 @@ class AccountsController < ApplicationController
   end
 
   def account_params
-    params.require(:account).permit(:name, :balance, :account_type)
+    params.require(:account).permit(:name, :initial_balance, :account_type)
   end
 end
