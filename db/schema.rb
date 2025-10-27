@@ -41,12 +41,12 @@ ActiveRecord::Schema[7.1].define(version: 2025_10_20_151551) do
     t.string "transaction_type", null: false
     t.decimal "amount", precision: 12, scale: 2, null: false
     t.string "description"
-    t.integer "debit_account_id"
-    t.integer "credit_account_id"
-    t.integer "user_id"
+    t.integer "debit_account_id", null: false
+    t.integer "credit_account_id", null: false
+    t.integer "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.date "transaction_date"
+    t.date "transaction_date", null: false
     t.index ["credit_account_id"], name: "index_transactions_on_credit_account_id"
     t.index ["debit_account_id"], name: "index_transactions_on_debit_account_id"
     t.index ["user_id"], name: "index_transactions_on_user_id"

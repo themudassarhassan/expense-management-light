@@ -1,28 +1,13 @@
 # frozen_string_literal: true
 
 class Transaction < ApplicationRecord
+  TYPES = %w[income expense borrow lend transfer pay receive].freeze
+
   validates :amount, presence: true, numericality: { greater_than_or_equal_to: 0 }
-  validates :type, presence: true
+  validates :transaction_type, inclusion: { in: TYPES }
 
   belongs_to :user
 
-  belongs_to :source_account, class_name: 'Account', optional: true
-  belongs_to :destination_account, class_name: 'Account', optional: true
-
-  after_initialize :set_defaults, if: :new_record?
-
-  # TODO: any other way to do this?
-  scope :within, ->(start_date, end_date) { where(created_at: start_date..end_date) }
-
-  def account_name
-    return "#{source_account.name} > #{destination_account.name}" if type == 'Transactions::Transfer'
-
-    account.name
-  end
-
-  private
-
-  def set_defaults
-    self.type ||= 'Transactions::Expense'
-  end
+  belongs_to :credit_account, class_name: 'Account'
+  belongs_to :debit_account, class_name: 'Account'
 end

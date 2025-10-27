@@ -7,10 +7,10 @@ class CreateTransactions < ActiveRecord::Migration[7.1]
       t.decimal :amount, null: false, scale: 2, precision: 12
       t.string :description
 
-      t.references :debit_account, foreign_key: { to_table: :accounts }
-      t.references :credit_account, foreign_key: { to_table: :accounts }
+      t.references :debit_account, foreign_key: { to_table: :accounts }, null: false
+      t.references :credit_account, foreign_key: { to_table: :accounts }, null: false
 
-      t.references :user, foreign_key: true
+      t.references :user, foreign_key: true, null: false
 
       t.timestamps
     end

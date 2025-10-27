@@ -1,7 +1,12 @@
 # frozen_string_literal: true
 
 class Account < ApplicationRecord
-  TYPES = %w[cash person bank expense income].freeze
+  ASSET_TYPES = %w[cash bank].freeze
+  EXPENSE_TYPE = 'expense'
+  INCOME_TYPE = 'income'
+  PERSON_TYPE = 'person'
+
+  TYPES = ASSET_TYPES + [EXPENSE_TYPE, INCOME_TYPE, PERSON_TYPE]
 
   validates :initial_balance, numericality: { greater_than_or_equal_to: 0 }
   validates :name, presence: true
@@ -11,4 +16,13 @@ class Account < ApplicationRecord
   belongs_to :user, optional: true
 
   enum account_type: TYPES.index_by(&:itself)
+
+  scope :system_generated, -> { where(system_generated: true) }
+  scope :asset_accounts, -> { where(account_type: ASSET_TYPES) }
+  scope :expense_accounts, -> { where(account_type: EXPENSE_TYPE) }
+  scope :income_accounts, -> { where(account_type: INCOME_TYPE) }
+
+  def transactions
+    Transaction.where('credit_account_id = ? or debit_account_id = ?', id, id)
+  end
 end
