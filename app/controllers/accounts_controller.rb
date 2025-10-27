@@ -1,11 +1,10 @@
 # frozen_string_literal: true
 
 class AccountsController < ApplicationController
-  before_action :authenticate_user!
   before_action :set_account, only: %i[edit update destroy]
 
   def index
-    @accounts = current_user.accounts
+    @accounts = Current.user.accounts
   end
 
   def new
@@ -15,7 +14,7 @@ class AccountsController < ApplicationController
   def edit; end
 
   def create
-    @account = current_user.accounts.build(account_params)
+    @account = Current.user.accounts.build(account_params)
 
     if @account.save
       redirect_to accounts_path

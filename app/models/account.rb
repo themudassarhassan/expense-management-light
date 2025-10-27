@@ -17,10 +17,9 @@ class Account < ApplicationRecord
 
   enum account_type: TYPES.index_by(&:itself)
 
-  scope :system_generated, -> { where(system_generated: true) }
   scope :asset_accounts, -> { where(account_type: ASSET_TYPES) }
-  scope :expense_accounts, -> { where(account_type: EXPENSE_TYPE) }
-  scope :income_accounts, -> { where(account_type: INCOME_TYPE) }
+  scope :system_expense_accounts, -> { where(account_type: EXPENSE_TYPE, system_generated: true) }
+  scope :system_income_accounts, -> { where(account_type: INCOME_TYPE, system_generated: true) }
 
   def transactions
     Transaction.where('credit_account_id = ? or debit_account_id = ?', id, id)

@@ -3,6 +3,8 @@
 class RegistrationsController < ApplicationController
   layout 'basic'
 
+  allow_unauthenticated_access
+
   def new
     @user = User.new
   end
@@ -10,8 +12,8 @@ class RegistrationsController < ApplicationController
   def create
     @user = User.new(user_params)
     if @user.save
-      session[:current_user_id] = @user.id
-      redirect_to root_path
+      start_new_session_for @user
+      redirect_to after_authentication_url
     else
       render :new, status: :unprocessable_entity
     end

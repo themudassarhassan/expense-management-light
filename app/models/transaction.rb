@@ -10,4 +10,10 @@ class Transaction < ApplicationRecord
 
   belongs_to :credit_account, class_name: 'Account'
   belongs_to :debit_account, class_name: 'Account'
+
+  after_initialize :set_default, if: :new_record?
+
+  def set_default
+    self.transaction_type ||= 'expense'
+  end
 end

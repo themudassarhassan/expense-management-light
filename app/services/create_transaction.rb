@@ -1,41 +1,27 @@
 # frozen_string_literal: true
 
 class CreateTransaction
-  attr_reader :user_id, :amount, :type, :source_account_id, :destination_account_id, :category_id, :description,
+  attr_reader :user_id, :amount, :transaction_type, :debit_account_id, :credit_account_id, :description,
               :transaction_date
 
   def initialize(**params)
     @user_id = params[:user_id]
     @amount = params[:amount]&.to_i
-    @type = params[:type]
-    @source_account_id = params[:source_account_id]
-    @destination_account_id = params[:destination_account_id]
-    @category_id = params[:category_id]
+    @transaction_type = params[:transaction_type]
+    @debit_account_id = params[:debit_account_id]
+    @credit_account_id = params[:credit_account_id]
     @description = params[:description]
     @transaction_date = params[:transaction_date]
   end
 
   def call
-    ActiveRecord::Base.transaction do
-      transaction = Transaction.create!(transaction_params)
-      source_account&.update!(balance: source_account.balance - amount)
-      destination_account&.update!(balance: destination_account.balance + amount)
-      transaction
-    end
+    Transaction.create!(transaction_params)
   end
 
   private
 
   def transaction_params
-    { user_id:, amount:, source_account_id:, destination_account_id:, description:, category_id:, type:,
+    { user_id:, amount:, debit_account_id:, credit_account_id:, description:, transaction_type:,
       transaction_date: }.compact
-  end
-
-  def source_account
-    @source_account ||= Account.find_by(id: source_account_id)
-  end
-
-  def destination_account
-    @destination_account ||= Account.find_by(id: destination_account_id)
   end
 end

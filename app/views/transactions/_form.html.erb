@@ -1,4 +1,4 @@
-<% type = transaction.type.split("::").last.downcase.to_sym %>
+<% type = transaction.transaction_type.to_sym %>
 <%= form_with model: transaction.becomes(Transaction), local: true, class: "bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4", data: { controller: 'transactions' } do |form| %>
   <% if transaction.errors.any? %>
     <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
@@ -19,11 +19,11 @@
     <div class="mb-4">
       <span class="block text-gray-700 text-sm font-bold mb-2">Transaction Type</span>
       <div class="flex items-center" data-controller="transaction-type">
-        <%= form.radio_button :type, 'Transactions::Expense', checked: true, data: { action: 'transaction-type#change', type_value: 'Transactions::Expense' }, class: "mr-2 leading-tight" %>
+        <%= form.radio_button :type, 'Transactions::Expense', checked: true, data: { action: 'transaction-type#change', type_value: 'expense' }, class: "mr-2 leading-tight" %>
         <%= form.label :type_expense, 'Expense', class: "mr-4 text-gray-700" %>
-        <%= form.radio_button :type, 'Transactions::Income', data: { action: 'transaction-type#change', type_value: 'Transactions::Income' }, class: "mr-2 leading-tight" %>
+        <%= form.radio_button :type, 'Transactions::Income', data: { action: 'transaction-type#change', type_value: 'income' }, class: "mr-2 leading-tight" %>
         <%= form.label :type_income, 'Income', class: "mr-4 text-gray-700" %>
-        <%= form.radio_button :type, 'Transactions::Transfer', data: { action: 'transaction-type#change', type_value: 'Transactions::Transfer' }, class: "mr-2 leading-tight" %>
+        <%= form.radio_button :type, 'Transactions::Transfer', data: { action: 'transaction-type#change', type_value: 'transfer' }, class: "mr-2 leading-tight" %>
         <%= form.label :type_transfer, 'Transfer', class: "mr-4 text-gray-700" %>
       </div>
     </div>
@@ -31,25 +31,25 @@
   <%= turbo_frame_tag "dynamic_fields" do %>
     <% if [:expense, :transfer].include?(type) %>
       <div class="mb-4">
-        <%= form.label :source_account_id, "From Account", class: "block text-gray-700 text-sm font-bold mb-2" %>
-        <%= form.collection_select :source_account_id, @accounts, :id, :name, prompt: 'Select from account', class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+        <%= form.label :credit_account_id, "From Account", class: "block text-gray-700 text-sm font-bold mb-2" %>
+        <%= form.collection_select :credit_account_id, Current.user.asset_accounts, :id, :name, prompt: 'Select from account', class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
       </div>
     <% end %>
     <% if [:income, :transfer].include?(type) %>
       <div class="mb-4">
-        <%= form.label :destination_account_id, "To Account", class: "block text-gray-700 text-sm font-bold mb-2" %>
-        <%= form.collection_select :destination_account_id, @accounts, :id, :name, prompt: 'Select to account', class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+        <%= form.label :debit_account_id, "To Account", class: "block text-gray-700 text-sm font-bold mb-2" %>
+        <%= form.collection_select :debit_account_id, Current.user.asset_accounts, :id, :name, prompt: 'Select to account', class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
       </div>
     <% end %>
     <% if type == :expense %>
       <div class="mb-4">
-        <%= form.label :category_id, "Category", class: "block text-gray-700 text-sm font-bold mb-2" %>
-        <%= form.collection_select :category_id, @expense_categories, :id, :name, prompt: 'Select Category', class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+        <%= form.label :debit_account_id, "Category", class: "block text-gray-700 text-sm font-bold mb-2" %>
+        <%= form.collection_select :debit_account_id, Current.user.expense_accounts, :id, :name, prompt: 'Select Category', class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
       </div>
     <% elsif type == :income %>
       <div class="mb-4">
-        <%= form.label :category_id, "Category", class: "block text-gray-700 text-sm font-bold mb-2" %>
-        <%= form.collection_select :category_id, @income_categories, :id, :name, prompt: 'Select Category', class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+        <%= form.label :credit_account_id, "Category", class: "block text-gray-700 text-sm font-bold mb-2" %>
+        <%= form.collection_select :credit_account_id, Current.user.income_accounts, :id, :name, prompt: 'Select Category', class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
       </div>
     <% end %>
   <% end %>

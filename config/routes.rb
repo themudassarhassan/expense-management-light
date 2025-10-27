@@ -11,7 +11,7 @@ Rails.application.routes.draw do
   root 'home#index'
 
   resource :registrations, only: %i[new create]
-  resource :sessions, only: %i[new create destroy]
+  resource :session, only: %i[new create destroy]
 
   resources :accounts
   resources :transactions

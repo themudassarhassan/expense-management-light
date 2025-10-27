@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class BudgetsController < ApplicationController
-  before_action :authenticate_user!
   before_action :set_budget, only: %i[edit update destroy]
   before_action :load_categories, only: %i[new create edit update]
 
