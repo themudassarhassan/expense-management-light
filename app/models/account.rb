@@ -14,12 +14,22 @@ class Account < ApplicationRecord
   validates :user_id, presence: true, unless: :system_generated
 
   belongs_to :user, optional: true
+  has_many :credit_transactions, class_name: 'Transaction', foreign_key: :credit_account_id, dependent: :destroy,
+                                 inverse_of: :credit_account
+
+  has_many :debit_transactions, class_name: 'Transaction', foreign_key: :debit_account_id, dependent: :destroy,
+                                inverse_of: :debit_account
 
   enum account_type: TYPES.index_by(&:itself)
 
+  scope :person_accounts, -> { where(account_type: PERSON_TYPE) }
   scope :asset_accounts, -> { where(account_type: ASSET_TYPES) }
   scope :system_expense_accounts, -> { where(account_type: EXPENSE_TYPE, system_generated: true) }
   scope :system_income_accounts, -> { where(account_type: INCOME_TYPE, system_generated: true) }
+
+  def current_balance
+    AccountBalanceCalculator.new(self).compute
+  end
 
   def transactions
     Transaction.where('credit_account_id = ? or debit_account_id = ?', id, id)

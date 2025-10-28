@@ -11,7 +11,7 @@ class User < ApplicationRecord
   has_many :transactions, dependent: :destroy
   has_many :budgets, dependent: :destroy
 
-  delegate :asset_accounts, to: :accounts
+  delegate :asset_accounts, :person_accounts, to: :accounts
 
   def expense_accounts
     own_expense_accounts + Account.system_expense_accounts
@@ -19,6 +19,14 @@ class User < ApplicationRecord
 
   def income_accounts
     own_income_accounts + Account.system_income_accounts
+  end
+
+  def to_accounts(transaction_type)
+    transaction_type == :transfer ? asset_accounts + person_accounts : asset_accounts
+  end
+
+  def from_accounts(transaction_type)
+    transaction_type == :transfer ? asset_accounts + person_accounts : asset_accounts
   end
 
   private
