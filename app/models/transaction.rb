@@ -13,6 +13,8 @@ class Transaction < ApplicationRecord
 
   after_initialize :set_default, if: :new_record?
 
+  scope :within, ->(start_date, end_date) { where(transaction_date: start_date..end_date) }
+
   def set_default
     self.transaction_type ||= 'expense'
   end

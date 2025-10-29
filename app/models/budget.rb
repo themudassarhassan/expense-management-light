@@ -5,13 +5,13 @@ class Budget < ApplicationRecord
   validates :budget_month, presence: true
 
   belongs_to :user
-  belongs_to :category
+  belongs_to :account
 
   def spent_amount
     user
-      .expense_transactions
+      .transactions
       .within(budget_month.beginning_of_month, budget_month.end_of_month)
-      .where(category_id: category.id)
+      .where(debit_account: account)
       .sum(:amount)
   end
 end

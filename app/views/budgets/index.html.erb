@@ -1,6 +1,5 @@
 <div class="max-w-4xl mx-auto mt-10">
   <h1 class="text-2xl font-bold mb-5 text-center">Your Budgets</h1>
-
   <% if @budgets.any? %>
     <table class="min-w-full bg-white shadow-md rounded">
       <thead>
@@ -16,7 +15,7 @@
           <tr>
             <td class="py-2 px-4 text-center border-b"><%= budget.budget_month.strftime("%B %Y") %></td>
             <td class="py-2 px-4 text-center border-b"><%= number_with_delimiter(budget.amount) %></td>
-            <td class="py-2 px-4 text-center border-b capitalize"><%= budget.category.name %></td>
+            <td class="py-2 px-4 text-center border-b capitalize"><%= budget.account.name %></td>
             <td class="py-2 px-4 text-center border-b"><%= number_with_delimiter(budget.spent_amount) %></td>
           </tr>
         <% end %>
