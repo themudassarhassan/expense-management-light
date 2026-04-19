@@ -1,0 +1,31 @@
+<div class="<%= dashboard_card_classes %>">
+  <div class="flex items-center justify-between gap-4">
+    <h2 class="<%= dashboard_section_heading_classes %>">Budgets this month</h2>
+    <%= link_to "Manage budgets", budgets_path, class: "shrink-0 text-sm font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300", data: { turbo_frame: "_top" } %>
+  </div>
+
+  <% if dashboard.no_budgets_this_month? %>
+    <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">No budgets for this month. Create one to track spending by category.</p>
+    <%= link_to "Add budget", new_budget_path, class: "mt-4 inline-flex rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 dark:bg-indigo-500 dark:hover:bg-indigo-400", data: { turbo_frame: "_top" } %>
+  <% else %>
+    <ul class="mt-4 space-y-4" role="list">
+      <% dashboard.month_budgets.each do |budget| %>
+        <% spent = budget.spent_amount %>
+        <% limit = budget.amount %>
+        <% status = dashboard_budget_status(spent, limit) %>
+        <% width = dashboard_budget_bar_width_percent(spent, limit) %>
+        <li class="border-b border-gray-100 pb-4 last:border-0 last:pb-0 dark:border-white/10">
+          <div class="flex items-start justify-between gap-2">
+            <p class="font-medium text-gray-900 dark:text-white"><%= budget.account.name %></p>
+            <p class="shrink-0 text-sm tabular-nums text-gray-600 dark:text-gray-300">
+              <%= number_with_delimiter(spent) %> / <%= number_with_delimiter(limit) %>
+            </p>
+          </div>
+          <div class="mt-2 <%= dashboard_budget_bar_outer_classes(status) %>">
+            <div class="<%= dashboard_budget_bar_inner_classes(status) %>" style="width: <%= width %>%"></div>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</div>

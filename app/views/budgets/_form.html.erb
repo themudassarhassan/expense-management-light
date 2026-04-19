@@ -13,7 +13,7 @@
 
   <div>
     <%= form.label :budget_month, "Budget month", class: form_label_classes %>
-    <%= form.select :budget_month, options_for_select((0..11).map { |i| [(Time.zone.now + i.months).strftime("%B %Y"), (Time.zone.now + i.months).strftime("%Y-%m-%d")] }), { prompt: "Select month" }, { class: form_control_classes } %>
+    <%= form.select :budget_month, options_for_select((0..11).map { |i| month = (Time.zone.now + i.months).beginning_of_month; [month.strftime("%B %Y"), month.to_date] }), { prompt: "Select month" }, { class: form_control_classes } %>
   </div>
 
   <div class="<%= form_secondary_actions_classes %>">

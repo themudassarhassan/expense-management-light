@@ -1,0 +1,29 @@
+<% m = dashboard.metrics %>
+<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+  <div class="<%= dashboard_card_classes %>">
+    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total balance</p>
+    <p class="mt-2 text-2xl font-bold tabular-nums tracking-tight text-gray-900 dark:text-white">
+      <%= number_with_delimiter(m.total_balance) %>
+    </p>
+    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Cash, bank &amp; person accounts</p>
+  </div>
+  <div class="<%= dashboard_card_classes %>">
+    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Income this month</p>
+    <p class="mt-2 text-xl font-semibold tabular-nums text-emerald-600 dark:text-emerald-400">
+      <%= number_with_delimiter(m.monthly_income) %>
+    </p>
+  </div>
+  <div class="<%= dashboard_card_classes %>">
+    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Expenses this month</p>
+    <p class="mt-2 text-xl font-semibold tabular-nums text-red-600 dark:text-red-400">
+      <%= number_with_delimiter(m.monthly_expense) %>
+    </p>
+  </div>
+  <div class="<%= dashboard_card_classes %>">
+    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Net this month</p>
+    <% net = m.monthly_net %>
+    <p class="mt-2 text-xl font-semibold tabular-nums <%= net >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400' %>">
+      <%= number_with_delimiter(net) %>
+    </p>
+  </div>
+</div>

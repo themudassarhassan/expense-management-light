@@ -12,7 +12,7 @@ module Breadcrumbs
   SectionConfig = Struct.new(:label, :index, :root_only, :ivar, keyword_init: true)
 
   REGISTRY = {
-    'home' => SectionConfig.new(label: nil, index: nil, root_only: true),
+    'home' => SectionConfig.new(label: 'Dashboard', index: nil, root_only: true),
     'sessions' => SectionConfig.new(label: 'Sign in', index: nil),
     'registrations' => SectionConfig.new(label: 'Sign up', index: nil, ivar: :@user)
   }.freeze
@@ -33,8 +33,9 @@ module Breadcrumbs
     def items
       return [] if skip?
 
-      crumbs = [Item.new(home: true, label: 'Home', url: @view.root_path, current: false)]
       section = section_config
+      home_label = section&.root_only && section.label.present? ? section.label : 'Home'
+      crumbs = [Item.new(home: true, label: home_label, url: @view.root_path, current: false)]
 
       return home_only_trail(crumbs) if section&.root_only
 

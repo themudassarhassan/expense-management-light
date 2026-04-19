@@ -1,0 +1,38 @@
+<div class="<%= dashboard_card_classes %>">
+  <div class="flex items-center justify-between gap-4">
+    <h2 class="<%= dashboard_section_heading_classes %>">Recent transactions</h2>
+    <%= link_to "View all", transactions_path, class: "shrink-0 text-sm font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300", data: { turbo_frame: "_top" } %>
+  </div>
+
+  <% if dashboard.recent_transactions.empty? %>
+    <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">No transactions yet. Add your first transaction.</p>
+    <%= link_to "New transaction", new_transaction_path(dashboard_context: 1), class: "mt-4 inline-flex rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 dark:bg-indigo-500 dark:hover:bg-indigo-400", data: { turbo_frame: "_top" } %>
+  <% else %>
+    <ul class="mt-4 divide-y divide-gray-100 dark:divide-white/10" role="list">
+      <% dashboard.recent_transactions.each do |transaction| %>
+        <li>
+          <%= link_to edit_transaction_path(transaction), class: "flex flex-col gap-1 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4", data: { turbo_frame: "_top" } do %>
+            <div class="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1">
+              <span class="<%= transaction_type_badge_classes(transaction.transaction_type) %>">
+                <%= transaction.transaction_type %>
+              </span>
+              <span class="text-sm text-gray-700 dark:text-gray-300">
+                <span class="font-medium text-gray-900 dark:text-white"><%= transaction.credit_account.name %></span>
+                <span class="text-gray-400" aria-hidden="true"> → </span>
+                <span class="font-medium text-gray-900 dark:text-white"><%= transaction.debit_account.name %></span>
+              </span>
+            </div>
+            <div class="flex shrink-0 items-center gap-4">
+              <span class="text-sm tabular-nums <%= transaction_amount_classes(transaction.transaction_type) %>">
+                <%= number_with_delimiter(transaction.amount) %>
+              </span>
+              <span class="text-xs text-gray-500 dark:text-gray-400">
+                <%= l(transaction.transaction_date, format: :long) %>
+              </span>
+            </div>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</div>

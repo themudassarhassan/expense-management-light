@@ -1,0 +1,7 @@
+<%= turbo_stream.replace "dashboard_summary", partial: "home/dashboard/summary_frame", locals: { dashboard: @dashboard } %>
+<%= turbo_stream.replace "dashboard_recent_transactions", partial: "home/dashboard/recent_transactions_frame", locals: { dashboard: @dashboard } %>
+<%= turbo_stream.replace "dashboard_accounts", partial: "home/dashboard/accounts_overview_frame", locals: { dashboard: @dashboard } %>
+<%= turbo_stream.replace "dashboard_budgets", partial: "home/dashboard/budgets_overview_frame", locals: { dashboard: @dashboard } %>
+<%= turbo_stream.append "body" do %>
+  <div data-controller="stream-visit" data-stream-visit-url-value="<%= root_path %>"></div>
+<% end %>

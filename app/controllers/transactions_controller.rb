@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class TransactionsController < ApplicationController
+  helper DashboardHelper
+
   before_action :set_transaction, only: %i[edit update destroy]
 
   def index
@@ -13,6 +15,7 @@ class TransactionsController < ApplicationController
 
   def new
     @transaction = Transaction.new(params.permit(:transaction_type))
+    @from_dashboard = params[:dashboard_context].present?
   end
 
   def edit; end
@@ -21,8 +24,19 @@ class TransactionsController < ApplicationController
     @transaction = Transaction.new(transaction_params.merge(user: Current.user))
 
     if @transaction.save
-      redirect_to transactions_path
+      if params[:dashboard_context].present?
+        respond_to do |format|
+          format.html { redirect_to root_path, notice: "Transaction saved." }
+          format.turbo_stream do
+            @dashboard = Dashboard::Snapshot.new(Current.user)
+            render :create
+          end
+        end
+      else
+        redirect_to transactions_path, notice: "Transaction saved."
+      end
     else
+      @from_dashboard = params[:dashboard_context].present?
       render :new, status: :unprocessable_entity
     end
   end

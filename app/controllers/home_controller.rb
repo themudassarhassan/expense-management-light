@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
 class HomeController < ApplicationController
-  def index; end
+  helper DashboardHelper
+
+  def index
+    @dashboard = Dashboard::Snapshot.new(Current.user)
+  end
 end
