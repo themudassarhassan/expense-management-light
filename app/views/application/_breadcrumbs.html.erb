@@ -1,7 +1,7 @@
 <% items = breadcrumb_items %>
 <% if items.any? %>
   <nav aria-label="Breadcrumb" class="mb-6 flex border-b border-gray-200 bg-white">
-    <ol role="list" class="mx-auto flex w-full max-w-(--breakpoint-xl) space-x-4 py-1">
+    <ol role="list" class="mx-auto flex w-full max-w-screen-xl space-x-4 py-1">
       <% items.each_with_index do |item, index| %>
         <li class="flex">
           <div class="flex items-center">

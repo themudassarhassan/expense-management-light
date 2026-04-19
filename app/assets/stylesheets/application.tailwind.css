@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  turbo-frame[busy] {
+    @apply pointer-events-none opacity-60 transition-opacity;
+  }
+}
+
 /*
 
 @layer components {

@@ -1,5 +1,5 @@
 <% type = transaction.transaction_type.to_sym %>
-<%= form_with model: transaction.becomes(Transaction), local: true, class: form_card_classes, data: { controller: 'transactions' } do |form| %>
+<%= form_with model: transaction.becomes(Transaction), class: form_card_classes do |form| %>
   <%= render "application/form_errors", object: transaction %>
 
   <div>
@@ -25,7 +25,7 @@
     </fieldset>
   <% end %>
 
-  <%= turbo_frame_tag "dynamic_fields" do %>
+  <%= turbo_frame_tag "dynamic_fields", class: "block" do %>
     <% if [:expense, :transfer].include?(type) %>
       <div>
         <%= form.label :credit_account_id, "From account", class: form_label_classes %>

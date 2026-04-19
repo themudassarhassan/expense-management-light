@@ -1,5 +1,4 @@
-<div class="px-4 sm:px-6 lg:px-8">
-  <div class="sm:flex sm:items-center">
+<div class="sm:flex sm:items-center">
     <div class="sm:flex-auto">
       <h1 class="text-base font-semibold text-gray-900 dark:text-gray-200">Accounts</h1>
     </div>
@@ -33,7 +32,7 @@
                     <td class="py-4 pr-4 pl-3 text-right text-sm whitespace-nowrap sm:pr-6" data-turbo-prefetch="false">
                       <%= link_to "Edit", edit_account_path(account), class: "text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300" %>
                       <span class="text-gray-300 dark:text-gray-600" aria-hidden="true"> · </span>
-                      <%= link_to "Delete", account_path(account), data: { turbo_method: :delete, turbo_confirm: "Are you sure?" }, class: "text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300" %>
+                      <%= link_to "Delete", account_path(account), data: { turbo_method: :delete, turbo_confirm: "Delete account \"#{account.name}\"? This cannot be undone." }, class: "text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300" %>
                     </td>
                   </tr>
                 <% end %>
@@ -49,4 +48,3 @@
       <%= link_to "Add your first account", new_account_path, class: "font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300" %>
     </p>
   <% end %>
-</div>

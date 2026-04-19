@@ -1,32 +1,28 @@
-<div class="max-w-md mx-auto mt-10">
-  <h1 class="text-2xl font-bold mb-5 text-center">Register</h1>
-  <%= form_with model: @user, url: registrations_path, local: true, class: "bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" do |form| %>
-    <% if @user.errors.any? %>
-      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
-        <strong class="font-bold">Oops!</strong>
-        <span class="block sm:inline">There were some problems with your input:</span>
-        <ul class="mt-2 list-disc list-inside text-sm text-red-600">
-          <% @user.errors.full_messages.each do |message| %>
-            <li><%= message %></li>
-          <% end %>
-        </ul>
+<div class="mx-auto mt-10 max-w-md">
+  <h1 class="text-center text-2xl font-semibold text-gray-900 dark:text-gray-100">Create account</h1>
+  <p class="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+    Already have an account?
+    <%= link_to "Sign in", new_session_path, class: "#{form_back_link_classes} font-normal" %>
+  </p>
+
+  <%= form_with model: @user, url: registrations_path, class: "mt-6 #{form_card_classes}" do |form| %>
+    <%= render "application/form_errors", object: @user %>
+    <div class="space-y-6">
+      <div>
+        <%= form.label :name, class: form_label_classes %>
+        <%= form.text_field :name, autocomplete: "name", class: form_control_classes %>
       </div>
-    <% end %>
-    <div class="mb-4">
-      <%= form.label :name, class: "block text-gray-700 text-sm font-bold mb-2" %>
-      <%= form.text_field :name, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+      <div>
+        <%= form.label :email, class: form_label_classes %>
+        <%= form.email_field :email, autocomplete: "email", class: form_control_classes %>
+      </div>
+      <div>
+        <%= form.label :password, class: form_label_classes %>
+        <%= form.password_field :password, autocomplete: "new-password", class: form_control_classes %>
+      </div>
+      <div>
+        <%= form.submit "Create account", class: "#{form_submit_classes} w-full" %>
+      </div>
     </div>
-    <div class="mb-4">
-      <%= form.label :email, class: "block text-gray-700 text-sm font-bold mb-2" %>
-      <%= form.email_field :email, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
-    </div>
-    <div class="mb-6">
-      <%= form.label :password, class: "block text-gray-700 text-sm font-bold mb-2" %>
-      <%= form.password_field :password, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" %>
-    </div>
-    <div class="flex items-center justify-between">
-      <%= form.submit "Register", class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" %>
-    </div>
-    <%= link_to "Login", new_session_path %>
   <% end %>
 </div>

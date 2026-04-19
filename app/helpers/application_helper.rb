@@ -5,9 +5,11 @@ module ApplicationHelper
   NAV_LINK_INACTIVE = 'text-gray-400 hover:bg-white/5 hover:text-white'
   NAV_LINK_ACTIVE = 'bg-white/5 text-white'
 
-  def nav_link_to(path, prefix_match: false, **options, &block)
+  def nav_link_to(path, prefix_match: false, match: nil, **options, &block)
     is_active =
-      if prefix_match
+      if match.respond_to?(:call)
+        match.call
+      elsif prefix_match
         path_str = path.to_s
         request.path == path_str || request.path.start_with?("#{path_str}/")
       else
@@ -54,6 +56,48 @@ module ApplicationHelper
 
   def form_secondary_actions_classes
     'flex flex-col-reverse gap-3 border-t border-gray-200 pt-6 dark:border-white/10 sm:flex-row sm:justify-end'
+  end
+
+  def layout_mobile_title
+    return content_for(:mobile_title) if content_for?(:mobile_title)
+
+    items = breadcrumb_items
+    return controller_name.humanize.titleize if items.empty?
+
+    items.reject(&:home).last&.label.presence || items.last&.label.presence || 'Home'
+  end
+
+  def nav_user_display_name
+    user = Current.user
+    return if user.blank?
+
+    user.name.presence || user.email
+  end
+
+  def nav_user_initials
+    name = nav_user_display_name
+    return '?' if name.blank?
+
+    parts = name.split(/\s+/)
+    if parts.length >= 2
+      "#{parts.first[0]}#{parts.last[0]}".upcase
+    else
+      name[0..1].upcase
+    end
+  end
+
+  def nav_sign_out_button_classes
+    'w-full rounded-md bg-white/10 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white'
+  end
+
+  def nav_primary_cta_classes
+    active = controller_name == 'transactions' && %w[new create].include?(action_name)
+    base = 'flex w-full items-center justify-center gap-x-2 rounded-md px-3 py-2.5 text-sm font-semibold shadow-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-400'
+    if active
+      "#{base} bg-indigo-400 text-white ring-1 ring-inset ring-white/30"
+    else
+      "#{base} bg-indigo-600 text-white hover:bg-indigo-500"
+    end
   end
 end
 

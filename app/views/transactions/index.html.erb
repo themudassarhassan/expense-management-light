@@ -1,5 +1,4 @@
-<div class="px-4 sm:px-6 lg:px-8">
-  <div class="sm:flex sm:items-center">
+<div class="sm:flex sm:items-center">
     <div class="sm:flex-auto">
       <h1 class="text-base font-semibold text-gray-900 dark:text-gray-200">Transactions</h1>
     </div>
@@ -53,7 +52,7 @@
                     <td class="py-4 pr-4 pl-3 text-right text-sm whitespace-nowrap sm:pr-6" data-turbo-prefetch="false">
                       <%= link_to "Edit", edit_transaction_path(transaction), class: "text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300" %>
                       <span class="text-gray-300 dark:text-gray-600" aria-hidden="true"> · </span>
-                      <%= link_to "Delete", transaction_path(transaction), data: { turbo_method: :delete, turbo_confirm: "Are you sure?" }, class: "text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300" %>
+                      <%= link_to "Delete", transaction_path(transaction), data: { turbo_method: :delete, turbo_confirm: "Delete this #{transaction.transaction_type} for #{number_with_delimiter(transaction.amount)} on #{l(transaction.transaction_date, format: :long)}?" }, class: "text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300" %>
                     </td>
                   </tr>
                 <% end %>
@@ -73,4 +72,3 @@
       <% end %>
     </p>
   <% end %>
-</div>

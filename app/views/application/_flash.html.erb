@@ -1,0 +1,11 @@
+<% flash.each do |type, message| %>
+  <% next if message.blank? %>
+  <% type_sym = type.to_sym %>
+  <% alert_like = %i[alert error].include?(type_sym) %>
+  <div class="mb-4 rounded-md px-4 py-3 text-sm <%= alert_like ? 'bg-red-50 text-red-800 dark:bg-red-500/10 dark:text-red-200' : 'bg-green-50 text-green-800 dark:bg-green-500/10 dark:text-green-200' %>"
+       role="<%= alert_like ? 'alert' : 'status' %>"
+       aria-live="<%= alert_like ? 'assertive' : 'polite' %>"
+       data-turbo-temporary>
+    <%= message %>
+  </div>
+<% end %>
