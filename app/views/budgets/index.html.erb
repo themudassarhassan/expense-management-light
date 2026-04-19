@@ -1,27 +1,54 @@
-<div class="max-w-4xl mx-auto mt-10">
-  <h1 class="text-2xl font-bold mb-5 text-center">Your Budgets</h1>
+<div class="px-4 sm:px-6 lg:px-8">
+  <div class="sm:flex sm:items-center">
+    <div class="sm:flex-auto">
+      <h1 class="text-base font-semibold text-gray-900 dark:text-gray-200">Budgets</h1>
+    </div>
+    <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+      <%= link_to "Add budget", new_budget_path, class: "block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500 dark:hover:bg-indigo-400 dark:focus-visible:outline-indigo-500" %>
+    </div>
+  </div>
+
   <% if @budgets.any? %>
-    <table class="min-w-full bg-white shadow-md rounded">
-      <thead>
-        <tr>
-          <th class="py-2 px-4 bg-gray-200 border-b">Month</th>
-          <th class="py-2 px-4 bg-gray-200 border-b">Budget Amount</th>
-          <th class="py-2 px-4 bg-gray-200 border-b">Category</th>
-          <th class="py-2 px-4 bg-gray-200 border-b">Spent Amount</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @budgets.each do |budget| %>
-          <tr>
-            <td class="py-2 px-4 text-center border-b"><%= budget.budget_month.strftime("%B %Y") %></td>
-            <td class="py-2 px-4 text-center border-b"><%= number_with_delimiter(budget.amount) %></td>
-            <td class="py-2 px-4 text-center border-b capitalize"><%= budget.account.name %></td>
-            <td class="py-2 px-4 text-center border-b"><%= number_with_delimiter(budget.spent_amount) %></td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
+    <div class="mt-8 flow-root">
+      <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+        <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+          <div class="overflow-hidden shadow-sm outline-1 outline-black/5 sm:rounded-lg dark:shadow-none dark:-outline-offset-1 dark:outline-white/10">
+            <table class="relative min-w-full divide-y divide-gray-300 dark:divide-white/15">
+              <thead class="bg-gray-50 dark:bg-gray-800/75">
+                <tr>
+                  <th scope="col" class="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-6 dark:text-gray-200">Month</th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">Category</th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">Budget</th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">Spent</th>
+                  <th scope="col" class="py-3.5 pr-4 pl-3 text-right text-sm font-semibold text-gray-900 sm:pr-6 dark:text-gray-200">
+                    <span class="sr-only">Actions</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200 bg-white dark:divide-white/10 dark:bg-gray-800/50">
+                <% @budgets.each do |budget| %>
+                  <tr>
+                    <td class="py-4 pr-3 pl-4 text-sm whitespace-nowrap text-gray-900 sm:pl-6 dark:text-white">
+                      <%= l(budget.budget_month, format: :long) %>
+                    </td>
+                    <td class="px-3 py-4 text-sm font-medium whitespace-nowrap text-gray-900 dark:text-white"><%= budget.account.name %></td>
+                    <td class="px-3 py-4 text-sm whitespace-nowrap tabular-nums text-gray-900 dark:text-white"><%= number_with_delimiter(budget.amount) %></td>
+                    <td class="px-3 py-4 text-sm whitespace-nowrap tabular-nums text-gray-500 dark:text-gray-400"><%= number_with_delimiter(budget.spent_amount) %></td>
+                    <td class="py-4 pr-4 pl-3 text-right text-sm whitespace-nowrap sm:pr-6" data-turbo-prefetch="false">
+                      <%= link_to "Delete", budget_path(budget), data: { turbo_method: :delete, turbo_confirm: "Are you sure?" }, class: "text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300" %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
   <% else %>
-    <p class="text-center text-gray-600 mt-5">You have no budgets. <%= link_to 'Create one', new_budget_path, class: "text-blue-500 underline" %></p>
+    <p class="mt-8 text-center text-sm text-gray-600 dark:text-gray-400">
+      You have no budgets yet.
+      <%= link_to "Add your first budget", new_budget_path, class: "font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300" %>
+    </p>
   <% end %>
 </div>

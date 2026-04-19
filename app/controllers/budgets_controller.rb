@@ -5,7 +5,7 @@ class BudgetsController < ApplicationController
   before_action :load_expense_accounts, only: %i[new create edit update]
 
   def index
-    @budgets = Current.user.budgets.order(budget_month: :desc)
+    @budgets = Current.user.budgets.includes(:account).order(budget_month: :desc)
   end
 
   def new
@@ -34,7 +34,7 @@ class BudgetsController < ApplicationController
   def destroy
     @budget.destroy
 
-    head :ok
+    redirect_to budgets_path
   end
 
   private

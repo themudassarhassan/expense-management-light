@@ -1,0 +1,22 @@
+<%= form_with model: @budget, local: true, class: form_card_classes do |form| %>
+  <%= render "application/form_errors", object: @budget %>
+
+  <div>
+    <%= form.label :amount, class: form_label_classes %>
+    <%= form.number_field :amount, step: :any, class: "#{form_control_classes} tabular-nums" %>
+  </div>
+
+  <div>
+    <%= form.label :account_id, "Category", class: form_label_classes %>
+    <%= form.collection_select :account_id, @expense_accounts, :id, :name, { prompt: "Select category" }, { class: form_control_classes } %>
+  </div>
+
+  <div>
+    <%= form.label :budget_month, "Budget month", class: form_label_classes %>
+    <%= form.select :budget_month, options_for_select((0..11).map { |i| [(Time.zone.now + i.months).strftime("%B %Y"), (Time.zone.now + i.months).strftime("%Y-%m-%d")] }), { prompt: "Select month" }, { class: form_control_classes } %>
+  </div>
+
+  <div class="<%= form_secondary_actions_classes %>">
+    <%= form.submit class: form_submit_classes %>
+  </div>
+<% end %>

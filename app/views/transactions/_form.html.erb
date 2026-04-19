@@ -1,67 +1,67 @@
 <% type = transaction.transaction_type.to_sym %>
-<%= form_with model: transaction.becomes(Transaction), local: true, class: "bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4", data: { controller: 'transactions' } do |form| %>
-  <% if transaction.errors.any? %>
-    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
-      <strong class="font-bold">Oops!</strong>
-      <span class="block sm:inline">There were some problems with your input:</span>
-      <ul class="mt-2 list-disc list-inside text-sm text-red-600">
-        <% transaction.errors.full_messages.each do |message| %>
-          <li><%= message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
-  <div class="mb-4">
-    <%= form.label :amount, class: "block text-gray-700 text-sm font-bold mb-2" %>
-    <%= form.number_field :amount, step: :any, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+<%= form_with model: transaction.becomes(Transaction), local: true, class: form_card_classes, data: { controller: 'transactions' } do |form| %>
+  <%= render "application/form_errors", object: transaction %>
+
+  <div>
+    <%= form.label :amount, class: form_label_classes %>
+    <%= form.number_field :amount, step: :any, class: "#{form_control_classes} tabular-nums" %>
   </div>
+
   <% unless transaction.persisted? %>
-    <div class="mb-4">
-      <span class="block text-gray-700 text-sm font-bold mb-2">Transaction Type</span>
-      <div class="flex items-center" data-controller="transaction-type">
-        <%= form.radio_button :transaction_type, 'expense', checked: true, data: { action: 'transaction-type#change', type_value: 'expense' }, class: "mr-2 leading-tight" %>
-        <%= form.label :type_expense, 'Expense', class: "mr-4 text-gray-700" %>
-        <%= form.radio_button :transaction_type, 'income', data: { action: 'transaction-type#change', type_value: 'income' }, class: "mr-2 leading-tight" %>
-        <%= form.label :type_income, 'Income', class: "mr-4 text-gray-700" %>
-        <%= form.radio_button :transaction_type, 'transfer', data: { action: 'transaction-type#change', type_value: 'transfer' }, class: "mr-2 leading-tight" %>
-        <%= form.label :type_transfer, 'Transfer', class: "mr-4 text-gray-700" %>
+    <fieldset class="min-w-0 border-0 p-0">
+      <legend class="<%= form_label_classes %> px-0">Transaction type</legend>
+      <div class="mt-3 flex flex-wrap gap-x-6 gap-y-3" data-controller="transaction-type">
+        <% [
+          %w[expense Expense],
+          %w[income Income],
+          %w[transfer Transfer]
+        ].each do |value, label| %>
+          <label class="inline-flex cursor-pointer items-center gap-2">
+            <%= form.radio_button :transaction_type, value, checked: (transaction.transaction_type == value), data: { action: 'transaction-type#change', type_value: value }, class: form_radio_classes %>
+            <span class="<%= form_radio_label_classes %>"><%= label %></span>
+          </label>
+        <% end %>
       </div>
-    </div>
+    </fieldset>
   <% end %>
+
   <%= turbo_frame_tag "dynamic_fields" do %>
     <% if [:expense, :transfer].include?(type) %>
-      <div class="mb-4">
-        <%= form.label :credit_account_id, "From Account", class: "block text-gray-700 text-sm font-bold mb-2" %>
-        <%= form.collection_select :credit_account_id, Current.user.from_accounts(type), :id, :name, prompt: 'Select from account', class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+      <div>
+        <%= form.label :credit_account_id, "From account", class: form_label_classes %>
+        <%= form.collection_select :credit_account_id, Current.user.from_accounts(type), :id, :name, { prompt: "Select from account" }, { class: form_control_classes } %>
       </div>
     <% end %>
     <% if [:income, :transfer].include?(type) %>
-      <div class="mb-4">
-        <%= form.label :debit_account_id, "To Account", class: "block text-gray-700 text-sm font-bold mb-2" %>
-        <%= form.collection_select :debit_account_id, Current.user.to_accounts(type), :id, :name, prompt: 'Select to account', class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+      <div>
+        <%= form.label :debit_account_id, "To account", class: form_label_classes %>
+        <%= form.collection_select :debit_account_id, Current.user.to_accounts(type), :id, :name, { prompt: "Select to account" }, { class: form_control_classes } %>
       </div>
     <% end %>
     <% if type == :expense %>
-      <div class="mb-4">
-        <%= form.label :debit_account_id, "Category", class: "block text-gray-700 text-sm font-bold mb-2" %>
-        <%= form.collection_select :debit_account_id, Current.user.expense_accounts, :id, :name, prompt: 'Select Category', class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+      <div>
+        <%= form.label :debit_account_id, "Category", class: form_label_classes %>
+        <%= form.collection_select :debit_account_id, Current.user.expense_accounts, :id, :name, { prompt: "Select category" }, { class: form_control_classes } %>
       </div>
     <% elsif type == :income %>
-      <div class="mb-4">
-        <%= form.label :credit_account_id, "Category", class: "block text-gray-700 text-sm font-bold mb-2" %>
-        <%= form.collection_select :credit_account_id, Current.user.income_accounts, :id, :name, prompt: 'Select Category', class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+      <div>
+        <%= form.label :credit_account_id, "Category", class: form_label_classes %>
+        <%= form.collection_select :credit_account_id, Current.user.income_accounts, :id, :name, { prompt: "Select category" }, { class: form_control_classes } %>
       </div>
     <% end %>
   <% end %>
-  <div class="mb-6">
-    <%= form.label :transaction_date, "Date", class: "block text-gray-700 text-sm font-bold mb-2" %>
-    <%= form.date_field :transaction_date%>
+
+  <div>
+    <%= form.label :transaction_date, "Date", class: form_label_classes %>
+    <%= form.date_field :transaction_date, class: form_control_classes %>
   </div>
-  <div class="mb-6">
-    <%= form.label :description, class: "block text-gray-700 text-sm font-bold mb-2" %>
-    <%= form.text_area :description, rows: 3, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+
+  <div>
+    <%= form.label :description, class: form_label_classes %>
+    <%= form.text_area :description, rows: 3, class: form_control_classes %>
   </div>
-  <div class="flex items-center justify-between">
-    <%= form.submit class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" %>
+
+  <div class="<%= form_secondary_actions_classes %>">
+    <%= form.submit class: form_submit_classes %>
   </div>
 <% end %>

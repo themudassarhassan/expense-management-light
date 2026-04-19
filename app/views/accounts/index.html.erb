@@ -1,30 +1,52 @@
-<div class="max-w-3xl mx-auto mt-10">
-  <h1 class="text-2xl font-bold mb-5 text-center">Your Accounts</h1>
+<div class="px-4 sm:px-6 lg:px-8">
+  <div class="sm:flex sm:items-center">
+    <div class="sm:flex-auto">
+      <h1 class="text-base font-semibold text-gray-900 dark:text-gray-200">Accounts</h1>
+    </div>
+    <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+      <%= link_to "Add account", new_account_path, class: "block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500 dark:hover:bg-indigo-400 dark:focus-visible:outline-indigo-500" %>
+    </div>
+  </div>
+
   <% if @accounts.any? %>
-    <table class="min-w-full bg-white shadow-md rounded">
-      <thead>
-        <tr>
-          <th class="py-2 px-4 bg-gray-200 border-b">Name</th>
-          <th class="py-2 px-4 bg-gray-200 border-b">Account Type</th>
-          <th class="py-2 px-4 bg-gray-200 border-b">Balance</th>
-          <th class="py-2 px-4 bg-gray-200 border-b">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @accounts.each do |account| %>
-          <tr>
-            <td class="py-2 px-4 border-b"><%= account.name %></td>
-            <td class="py-2 px-4 border-b capitalize"><%= account.account_type %></td>
-            <td class="py-2 px-4 border-b"><%= number_with_delimiter(account.current_balance) %></td>
-            <td class="py-2 px-4 border-b" data-turbo-prefetch="false">
-              <%= link_to 'Edit', edit_account_path(account), class: "inline-block bg-yellow-300 hover:bg-yellow-400 text-yellow-900 font-bold py-1 px-2 rounded mr-2" %>
-              <%= link_to 'Delete', account, data: {turbo_method: :delete, turbo_confirm: 'Are you sure?'}, class: "inline-block bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded" %>
-            </td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
+    <div class="mt-8 flow-root">
+      <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+        <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+          <div class="overflow-hidden shadow-sm outline-1 outline-black/5 sm:rounded-lg dark:shadow-none dark:-outline-offset-1 dark:outline-white/10">
+            <table class="relative min-w-full divide-y divide-gray-300 dark:divide-white/15">
+              <thead class="bg-gray-50 dark:bg-gray-800/75">
+                <tr>
+                  <th scope="col" class="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-6 dark:text-gray-200">Name</th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">Account type</th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">Balance</th>
+                  <th scope="col" class="py-3.5 pr-4 pl-3 text-right text-sm font-semibold text-gray-900 sm:pr-6 dark:text-gray-200">
+                    <span class="sr-only">Actions</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200 bg-white dark:divide-white/10 dark:bg-gray-800/50">
+                <% @accounts.each do |account| %>
+                  <tr>
+                    <td class="py-4 pr-3 pl-4 text-sm font-medium whitespace-nowrap text-gray-900 sm:pl-6 dark:text-white"><%= account.name %></td>
+                    <td class="px-3 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400"><%= account.account_type.titleize %></td>
+                    <td class="px-3 py-4 text-sm whitespace-nowrap tabular-nums text-gray-900 dark:text-white"><%= number_with_delimiter(account.current_balance) %></td>
+                    <td class="py-4 pr-4 pl-3 text-right text-sm whitespace-nowrap sm:pr-6" data-turbo-prefetch="false">
+                      <%= link_to "Edit", edit_account_path(account), class: "text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300" %>
+                      <span class="text-gray-300 dark:text-gray-600" aria-hidden="true"> · </span>
+                      <%= link_to "Delete", account_path(account), data: { turbo_method: :delete, turbo_confirm: "Are you sure?" }, class: "text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300" %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
   <% else %>
-    <p class="text-center text-gray-600 mt-5">You have no accounts. <%= link_to 'Create one', new_account_path, class: "text-blue-500 underline" %></p>
+    <p class="mt-8 text-center text-sm text-gray-600 dark:text-gray-400">
+      You have no accounts yet.
+      <%= link_to "Add your first account", new_account_path, class: "font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300" %>
+    </p>
   <% end %>
 </div>
