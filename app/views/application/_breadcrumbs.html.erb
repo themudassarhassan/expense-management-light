@@ -1,0 +1,42 @@
+<% items = breadcrumb_items %>
+<% if items.any? %>
+  <nav aria-label="Breadcrumb" class="mb-6 flex border-b border-gray-200 bg-white">
+    <ol role="list" class="mx-auto flex w-full max-w-(--breakpoint-xl) space-x-4 py-1">
+      <% items.each_with_index do |item, index| %>
+        <li class="flex">
+          <div class="flex items-center">
+            <% if index.positive? %>
+              <svg viewBox="0 0 24 44" fill="currentColor" preserveAspectRatio="none" aria-hidden="true" class="h-full w-6 shrink-0 text-gray-200">
+                <path d="M.293 0l22 22-22 22h1.414l22-22-22-22H.293z" />
+              </svg>
+            <% end %>
+            <% text_classes = item.home ? "" : "ml-4 text-sm font-medium " %>
+            <% if item.home %>
+              <% if item.current %>
+                <span class="text-gray-400" aria-current="page">
+                  <svg viewBox="0 0 20 20" fill="currentColor" data-slot="icon" aria-hidden="true" class="size-5 shrink-0">
+                    <path d="M9.293 2.293a1 1 0 0 1 1.414 0l7 7A1 1 0 0 1 17 11h-1v6a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-6H3a1 1 0 0 1-.707-1.707l7-7Z" clip-rule="evenodd" fill-rule="evenodd" />
+                  </svg>
+                  <span class="sr-only"><%= item.label %></span>
+                </span>
+              <% else %>
+                <%= link_to item.url, class: "text-gray-400 hover:text-gray-500" do %>
+                  <svg viewBox="0 0 20 20" fill="currentColor" data-slot="icon" aria-hidden="true" class="size-5 shrink-0">
+                    <path d="M9.293 2.293a1 1 0 0 1 1.414 0l7 7A1 1 0 0 1 17 11h-1v6a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-6H3a1 1 0 0 1-.707-1.707l7-7Z" clip-rule="evenodd" fill-rule="evenodd" />
+                  </svg>
+                  <span class="sr-only"><%= item.label %></span>
+                <% end %>
+              <% end %>
+            <% elsif item.url.present? && !item.current %>
+              <%= link_to item.label, item.url, class: text_classes + "text-gray-500 hover:text-gray-700" %>
+            <% else %>
+              <span class="<%= text_classes %>text-gray-700"<% if item.current %> aria-current="page"<% end %>>
+                <%= item.label %>
+              </span>
+            <% end %>
+          </div>
+        </li>
+      <% end %>
+    </ol>
+  </nav>
+<% end %>
