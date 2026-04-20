@@ -1,21 +1,29 @@
 # frozen_string_literal: true
 
 class TransactionsController < ApplicationController
-  helper DashboardHelper
-
   before_action :set_transaction, only: %i[edit update destroy]
 
   def index
-    @transactions = ListTransactions.new(
-      user_id: Current.user.id,
-      page: params.fetch(:page, 1),
-      category_id: params[:category_id]
-    ).call
+    scope = Transaction
+            .where(user: Current.user)
+            .includes(:credit_account, :debit_account)
+            .order(created_at: :desc)
+    @pagy, @transactions = pagy(:offset, scope)
+    redirect_to transactions_path(request.query_parameters.merge(page: @pagy.last)) if transactions_page_overflow?
+    return if performed?
+
+    # Turbo may follow redirects with an Accept that prefers turbo_stream. Our index
+    # turbo_stream template only appends rows (load more); full visits must be HTML.
+    coerce_transactions_index_to_html! unless transactions_index_load_more_stream?
+
+    respond_to do |format|
+      format.html
+      format.turbo_stream
+    end
   end
 
   def new
     @transaction = Transaction.new(params.permit(:transaction_type))
-    @from_dashboard = params[:dashboard_context].present?
   end
 
   def edit; end
@@ -24,19 +32,8 @@ class TransactionsController < ApplicationController
     @transaction = Transaction.new(transaction_params.merge(user: Current.user))
 
     if @transaction.save
-      if params[:dashboard_context].present?
-        respond_to do |format|
-          format.html { redirect_to root_path, notice: "Transaction saved." }
-          format.turbo_stream do
-            @dashboard = Dashboard::Snapshot.new(Current.user)
-            render :create
-          end
-        end
-      else
-        redirect_to transactions_path, notice: "Transaction saved."
-      end
+      redirect_to transactions_path, notice: "Transaction saved."
     else
-      @from_dashboard = params[:dashboard_context].present?
       render :new, status: :unprocessable_entity
     end
   end
@@ -65,5 +62,19 @@ class TransactionsController < ApplicationController
     params.require(:transaction).permit(
       :amount, :description, :debit_account_id, :credit_account_id, :transaction_type, :transaction_date
     )
+  end
+
+  def transactions_page_overflow?
+    @pagy.last && (@pagy.page > @pagy.last)
+  end
+
+  def transactions_index_load_more_stream?
+    request.format == :turbo_stream && params[:page].to_i >= 2
+  end
+
+  def coerce_transactions_index_to_html!
+    return unless request.format == :turbo_stream
+
+    request.format = :html
   end
 end

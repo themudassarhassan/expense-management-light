@@ -1,0 +1,7 @@
+<%= turbo_stream.append "transactions_tbody" do %>
+  <%= render partial: "transactions/transaction_row", collection: @transactions, as: :transaction %>
+<% end %>
+
+<%= turbo_stream.replace "transactions_pagination" do %>
+  <%= render "transactions/pagination" %>
+<% end %>

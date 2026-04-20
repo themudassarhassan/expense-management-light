@@ -1,9 +1,5 @@
 <% type = transaction.transaction_type.to_sym %>
-<% from_dashboard = local_assigns[:from_dashboard] %>
 <%= form_with model: transaction.becomes(Transaction), class: form_card_classes do |form| %>
-  <% if from_dashboard %>
-    <%= hidden_field_tag :dashboard_context, "1" %>
-  <% end %>
   <%= render "application/form_errors", object: transaction %>
 
   <div>
@@ -14,7 +10,7 @@
   <% unless transaction.persisted? %>
     <fieldset class="min-w-0 border-0 p-0">
       <legend class="<%= form_label_classes %> px-0">Transaction type</legend>
-      <div class="mt-3 flex flex-wrap gap-x-6 gap-y-3" data-controller="transaction-type" data-transaction-type-dashboard-context-value="<%= from_dashboard ? '1' : '' %>">
+      <div class="mt-3 flex flex-wrap gap-x-6 gap-y-3" data-controller="transaction-type">
         <% [
           %w[expense Expense],
           %w[income Income],

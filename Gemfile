@@ -28,6 +28,9 @@ gem 'tailwindcss-rails', '~> 2.6'
 # Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
 gem 'stimulus-rails'
 
+# Pagination [https://github.com/ddnexus/pagy]
+gem 'pagy', '~> 43'
+
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem 'jbuilder'
 
