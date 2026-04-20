@@ -4,10 +4,9 @@ class TransactionsController < ApplicationController
   before_action :set_transaction, only: %i[edit update destroy]
 
   def index
-    scope = Transaction
-            .where(user: Current.user)
-            .includes(:credit_account, :debit_account)
-            .order(created_at: :desc)
+    @transactions_filter = TransactionsFilter.new(user: Current.user, params: filter_params)
+    @any_transactions = Transaction.where(user: Current.user).exists?
+    scope = @transactions_filter.scope
     @pagy, @transactions = pagy(:offset, scope)
     redirect_to transactions_path(request.query_parameters.merge(page: @pagy.last)) if transactions_page_overflow?
     return if performed?
@@ -62,6 +61,10 @@ class TransactionsController < ApplicationController
     params.require(:transaction).permit(
       :amount, :description, :debit_account_id, :credit_account_id, :transaction_type, :transaction_date
     )
+  end
+
+  def filter_params
+    params.permit(:date_range, :from_date, :to_date, :type, :page)
   end
 
   def transactions_page_overflow?

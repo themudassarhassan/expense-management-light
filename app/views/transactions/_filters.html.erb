@@ -1,0 +1,59 @@
+<% f = @transactions_filter %>
+<% custom_dates = f.date_range == "custom" %>
+<div class="mb-6 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
+  <div class="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-end sm:gap-6">
+    <%= form_with url: transactions_path, method: :get, data: { turbo_frame: "transactions_index", turbo_action: "advance", controller: "transaction-filters", transaction_filters_range_custom_value: "custom" }, class: "flex min-w-0 flex-wrap items-end gap-3" do %>
+      <% if f.type.present? %>
+        <%= hidden_field_tag :type, f.type %>
+      <% end %>
+      <div class="min-w-0 shrink-0">
+        <label for="date_range" class="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">Date range</label>
+        <%= select_tag :date_range,
+              options_for_select(
+                [
+                  ["Last 7 days", "last_7_days"],
+                  ["This month", "this_month"],
+                  ["Last month", "last_month"],
+                  ["Custom range", "custom"]
+                ],
+                f.date_range
+              ),
+              id: "date_range",
+              class: "#{transaction_date_range_select_classes} min-w-[11rem]",
+              data: { action: "change->transaction-filters#dateRangeChanged" } %>
+      </div>
+      <div data-transaction-filters-target="customFields" class="flex min-w-0 flex-wrap items-end gap-2 <%= "hidden" unless custom_dates %>">
+        <div>
+          <label for="from_date" class="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">From</label>
+          <%= date_field_tag :from_date, params[:from_date], id: "from_date", class: form_control_classes, disabled: !custom_dates, required: custom_dates, data: { transaction_filters_target: "fromInput" } %>
+        </div>
+        <span class="hidden pb-2 text-sm text-gray-400 sm:inline dark:text-gray-500" aria-hidden="true">→</span>
+        <div>
+          <label for="to_date" class="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">To</label>
+          <%= date_field_tag :to_date, params[:to_date], id: "to_date", class: form_control_classes, disabled: !custom_dates, required: custom_dates, data: { transaction_filters_target: "toInput" } %>
+        </div>
+        <%= submit_tag "Apply", class: "inline-flex cursor-pointer justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500 dark:hover:bg-indigo-400 dark:focus-visible:outline-indigo-500" %>
+      </div>
+    <% end %>
+
+    <div class="flex flex-col gap-1">
+      <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Type</span>
+      <div class="inline-flex flex-wrap gap-1 rounded-lg bg-gray-100 p-1 dark:bg-white/5" role="group" aria-label="Transaction type">
+        <%= link_to "All", transactions_filtered_path(reset_page: true, clear_type: true), class: transaction_filter_segment_classes(f.type.blank?), data: { turbo_frame: "transactions_index", turbo_action: "advance" } %>
+        <%= link_to "Income", transactions_filtered_path(type: "income", reset_page: true), class: transaction_filter_segment_classes(f.type == "income"), data: { turbo_frame: "transactions_index", turbo_action: "advance" } %>
+        <%= link_to "Expense", transactions_filtered_path(type: "expense", reset_page: true), class: transaction_filter_segment_classes(f.type == "expense"), data: { turbo_frame: "transactions_index", turbo_action: "advance" } %>
+        <%= link_to "Transfer", transactions_filtered_path(type: "transfer", reset_page: true), class: transaction_filter_segment_classes(f.type == "transfer"), data: { turbo_frame: "transactions_index", turbo_action: "advance" } %>
+      </div>
+    </div>
+  </div>
+
+  <% if f.resettable? %>
+    <div class="shrink-0 sm:ml-auto">
+      <%= link_to "Reset filters", transactions_path, class: "text-sm font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300", data: { turbo_frame: "transactions_index", turbo_action: "advance" } %>
+    </div>
+  <% end %>
+</div>
+
+<% if f.date_range_error.present? %>
+  <p class="mb-4 text-sm text-red-600 dark:text-red-400" role="alert"><%= f.date_range_error %></p>
+<% end %>
