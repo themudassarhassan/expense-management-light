@@ -56,16 +56,18 @@ module TransactionsHelper
     end
   end
 
-  def transaction_amount_classes(transaction_type)
+  def transaction_amount_classes(transaction_type, font_weight: :medium)
+    bold = font_weight == :bold
+    weight = bold ? "font-bold" : "font-medium"
     case transaction_type.to_s
     when "income"
-      "font-medium text-emerald-700 tabular-nums dark:text-emerald-400"
+      "#{weight} text-emerald-700 tabular-nums dark:text-emerald-400"
     when "expense"
-      "font-medium text-red-700 tabular-nums dark:text-red-400"
+      "#{weight} text-red-700 tabular-nums dark:text-red-400"
     when "transfer"
-      "font-medium text-sky-700 tabular-nums dark:text-sky-400"
+      "#{weight} text-sky-700 tabular-nums dark:text-sky-400"
     else
-      "text-gray-900 tabular-nums dark:text-white"
+      bold ? "font-bold text-gray-900 tabular-nums dark:text-white" : "text-gray-900 tabular-nums dark:text-white"
     end
   end
 end

@@ -1,0 +1,23 @@
+<article class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-colors hover:border-gray-300 active:bg-gray-50/80 dark:border-white/10 dark:bg-gray-800/50 dark:hover:border-white/20 dark:active:bg-white/5">
+  <div class="flex items-start justify-between gap-3">
+    <span class="<%= transaction_type_badge_classes(transaction.transaction_type) %>">
+      <%= transaction.transaction_type %>
+    </span>
+    <span class="text-right text-base <%= transaction_amount_classes(transaction.transaction_type, font_weight: :bold) %>">
+      <%= number_with_delimiter(transaction.amount) %>
+    </span>
+  </div>
+  <div class="mt-3 min-w-0">
+    <%= render "transactions/transaction_flow", transaction: transaction %>
+  </div>
+  <div class="mt-3 flex items-center justify-between gap-3">
+    <time class="text-sm text-gray-500 dark:text-gray-400" datetime="<%= transaction.transaction_date.iso8601 %>">
+      <%= l(transaction.transaction_date, format: :long) %>
+    </time>
+    <div class="shrink-0 text-right text-sm whitespace-nowrap" data-turbo-prefetch="false">
+      <%= link_to "Edit", edit_transaction_path(transaction), class: "inline-flex min-h-11 items-center text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300", data: { turbo_frame: "_top" } %>
+      <span class="text-gray-300 dark:text-gray-600" aria-hidden="true"> · </span>
+      <%= link_to "Delete", transaction_path(transaction), class: "inline-flex min-h-11 items-center text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300", data: { turbo_frame: "_top", turbo_method: :delete, turbo_confirm: "Delete this #{transaction.transaction_type} for #{number_with_delimiter(transaction.amount)} on #{l(transaction.transaction_date, format: :long)}?" } %>
+    </div>
+  </div>
+</article>

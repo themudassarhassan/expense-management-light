@@ -2,6 +2,10 @@
   <%= render partial: "transactions/transaction_row", collection: @transactions, as: :transaction %>
 <% end %>
 
+<%= turbo_stream.append "transactions_mobile_list" do %>
+  <%= render partial: "transactions/transaction_card", collection: @transactions, as: :transaction %>
+<% end %>
+
 <%= turbo_stream.replace "transactions_pagination" do %>
   <%= render "transactions/pagination" %>
 <% end %>

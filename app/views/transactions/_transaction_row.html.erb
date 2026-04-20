@@ -5,15 +5,7 @@
     </span>
   </td>
   <td class="min-w-0 px-3 py-4 text-sm text-gray-900 dark:text-white">
-    <div class="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
-      <span class="min-w-0 break-words font-medium text-gray-900 dark:text-white"><%= transaction.credit_account.name %></span>
-      <span class="inline-flex shrink-0 text-gray-400 dark:text-gray-500" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="size-5">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-        </svg>
-      </span>
-      <span class="min-w-0 break-words font-medium text-gray-900 dark:text-white"><%= transaction.debit_account.name %></span>
-    </div>
+    <%= render "transactions/transaction_flow", transaction: transaction %>
   </td>
   <td class="px-3 py-4 text-sm whitespace-nowrap <%= transaction_amount_classes(transaction.transaction_type) %>">
     <%= number_with_delimiter(transaction.amount) %>
@@ -22,8 +14,8 @@
     <%= l(transaction.transaction_date, format: :long) %>
   </td>
   <td class="py-4 pr-4 pl-3 text-right text-sm whitespace-nowrap sm:pr-6" data-turbo-prefetch="false">
-    <%= link_to "Edit", edit_transaction_path(transaction), class: "text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300" %>
+    <%= link_to "Edit", edit_transaction_path(transaction), class: "text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300", data: { turbo_frame: "_top" } %>
     <span class="text-gray-300 dark:text-gray-600" aria-hidden="true"> · </span>
-    <%= link_to "Delete", transaction_path(transaction), data: { turbo_method: :delete, turbo_confirm: "Delete this #{transaction.transaction_type} for #{number_with_delimiter(transaction.amount)} on #{l(transaction.transaction_date, format: :long)}?" }, class: "text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300" %>
+    <%= link_to "Delete", transaction_path(transaction), class: "text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300", data: { turbo_frame: "_top", turbo_method: :delete, turbo_confirm: "Delete this #{transaction.transaction_type} for #{number_with_delimiter(transaction.amount)} on #{l(transaction.transaction_date, format: :long)}?" } %>
   </td>
 </tr>

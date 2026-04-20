@@ -1,0 +1,9 @@
+<div class="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-sm text-gray-900 dark:text-white">
+  <span class="min-w-0 break-words font-medium text-gray-900 dark:text-white"><%= transaction.credit_account.name %></span>
+  <span class="inline-flex shrink-0 text-gray-400 dark:text-gray-500" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="size-5">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+    </svg>
+  </span>
+  <span class="min-w-0 break-words font-medium text-gray-900 dark:text-white"><%= transaction.debit_account.name %></span>
+</div>
