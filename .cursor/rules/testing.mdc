@@ -1,0 +1,70 @@
+---
+description: RSpec, FactoryBot, and Hotwire-related testing conventions for this Rails app
+globs: spec/**/*.rb
+alwaysApply: false
+---
+
+# Testing (RSpec, FactoryBot, Hotwire)
+
+## Stack and commands
+
+- Run the full suite: `bundle exec rspec`
+- Run one file: `bundle exec rspec spec/path/to/file_spec.rb`
+- Run one example: `bundle exec rspec spec/path/to/file_spec.rb:42`
+
+## Layout and spec types
+
+- Mirror `app/`: e.g. `spec/models`, `spec/requests`, `spec/system`, `spec/services`, `spec/helpers`.
+- `infer_spec_type_from_file_location` is enabled in `rails_helper` — put specs in the correct directory so `type:` is inferred; add `type:` explicitly only when needed.
+
+## RSpec style
+
+- Use `describe` / `context` with clear names.
+- Prefer `expect(...).to` (not `should`).
+- Prefer `let` for lazy setup; use `let!` when the example depends on side effects or creation order.
+- Test behavior and public APIs, not Rails internals.
+
+```ruby
+# Prefer
+expect(user).to be_valid
+
+# Avoid vague examples with no assertion on behavior
+```
+
+## FactoryBot
+
+- `FactoryBot::Syntax::Methods` is included — use `create`, `build`, `build_stubbed`, `attributes_for` without a `FactoryBot.` prefix.
+- Use **`create`** when the example needs persisted records; use **`build`** / **`build_stubbed`** when the DB is unnecessary.
+- Use **traits** for variants (e.g. transaction types); avoid copy-pasting setup across files.
+
+```ruby
+create(:transaction, :expense)
+create(:user, email: "user-#{SecureRandom.hex(4)}@example.com") # when uniqueness matters
+```
+
+- Prefer **sequences** or unique values for attributes with DB uniqueness constraints — avoid the same fixed email/name across examples when the schema enforces uniqueness.
+- Minimize **callbacks in factories** that `update` associated records (`after(:build)` / `after(:create)`). They make tests order-dependent and hide setup. Prefer explicit setup in the example or a dedicated service when refactoring.
+
+## Mocks and test doubles
+
+- **Default to real behavior** — persisted records via FactoryBot, real associations, and full request/system paths when practical. That exercises the same flows users and controllers use and catches integration bugs.
+- **Do not overuse mocks or stubs.** Heavy mocking can make tests pass while the app is broken; prefer testing what the application actually does.
+- Reserve doubles for **clear boundaries**: external HTTP/APIs, time or randomness you need to fix, or isolating a single unit when a full-stack example would be impractical.
+- `verify_partial_doubles` is enabled in `spec_helper` — stubs on real objects must match real methods.
+
+## Hotwire / Turbo
+
+- **System specs** (Capybara + Selenium per Gemfile): assert on visible outcomes — text, elements, path (`have_current_path`). Capybara waits for async updates; avoid arbitrary `sleep`.
+- **Request specs**: assert HTTP status and body (including Turbo Stream responses) without a browser.
+- **Stimulus**: prefer system specs for integration unless the project adds a JS unit test runner; do not introduce Jest/Vitest unless the team adds it to the stack.
+
+## Support files
+
+- Shared helpers, matchers, and config live under `spec/support/**/*.rb`.
+- Do not name support files `*_spec.rb` (they would run as specs).
+- New files in `spec/support` are auto-required from `rails_helper`.
+
+## What to avoid
+
+- Leaving `:focus` / `fit` / `fdescribe` committed in shared branches — use locally or via `.rspec-local`.
+- Duplicating factory data across many examples when a **trait** or **let** would centralize it.
