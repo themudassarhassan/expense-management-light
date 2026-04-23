@@ -4,7 +4,7 @@ globs: spec/**/*.rb
 alwaysApply: false
 ---
 
-# Testing (RSpec, FactoryBot, Hotwire)
+# Testing (RSpec, FactoryBot, shoulda-matchers, Hotwire)
 
 ## Stack and commands
 
@@ -44,6 +44,12 @@ create(:user, email: "user-#{SecureRandom.hex(4)}@example.com") # when uniquenes
 
 - Prefer **sequences** or unique values for attributes with DB uniqueness constraints — avoid the same fixed email/name across examples when the schema enforces uniqueness.
 - Minimize **callbacks in factories** that `update` associated records (`after(:build)` / `after(:create)`). They make tests order-dependent and hide setup. Prefer explicit setup in the example or a dedicated service when refactoring.
+
+## shoulda-matchers
+
+- Use [shoulda-matchers](https://github.com/thoughtbot/shoulda-matchers) in **model** specs (and other layers where a matcher exists) to keep validation and association tests short and consistent: e.g. `belong_to`, `have_many`…`dependent`, `validate_presence_of`, `validate_uniqueness_of`, `have_secure_password`, `delegate_method`.
+- Prefer a **`subject` block** (often `build(:user)` with FactoryBot) when matchers need a well-formed in-memory model (notably `validate_uniqueness_of` and `have_secure_password`).
+- Shoulda covers **repetitive Rails “wiring”**; keep separate **`expect` / `it` examples** for domain behavior that matchers do not model (e.g. custom `User#to_accounts` logic).
 
 ## Mocks and test doubles
 

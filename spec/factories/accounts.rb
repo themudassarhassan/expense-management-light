@@ -2,9 +2,23 @@
 
 FactoryBot.define do
   factory :account do
-    name { 'My bank account' }
+    sequence(:name) { |n| "Account #{n}" }
     account_type { 'bank' }
-    balance { 20 }
+    initial_balance { 20 }
     user
+
+    trait :system_expense do
+      system_generated { true }
+      user { nil }
+      account_type { 'expense' }
+      initial_balance { 0 }
+    end
+
+    trait :system_income do
+      system_generated { true }
+      user { nil }
+      account_type { 'income' }
+      initial_balance { 0 }
+    end
   end
 end

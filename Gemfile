@@ -82,4 +82,6 @@ group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem 'capybara'
   gem 'selenium-webdriver'
+  # One-liner matchers for model validations, associations, etc. [https://github.com/thoughtbot/shoulda-matchers]
+  gem 'shoulda-matchers', '~> 6.0'
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_10_28_164655) do
+ActiveRecord::Schema[7.1].define(version: 2026_01_23_120000) do
   create_table "accounts", force: :cascade do |t|
     t.string "name", null: false
     t.decimal "initial_balance", precision: 12, scale: 2, default: "0.0", null: false
@@ -37,6 +37,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_10_28_164655) do
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "category_type", default: "expense", null: false
   end
 
   create_table "sessions", force: :cascade do |t|
