@@ -1,0 +1,73 @@
+# frozen_string_literal: true
+
+require 'rails_helper'
+
+RSpec.describe 'Accounts', type: :request do
+  let(:user) { create(:user) }
+
+  it_behaves_like 'a request that requires sign-in' do
+    let(:unauthenticated_request) { proc { get accounts_path } }
+  end
+
+  context 'when signed in' do
+    before { sign_in_as(user) }
+
+    describe 'GET /accounts' do
+      it 'returns success' do
+        get accounts_path
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include('Accounts')
+      end
+    end
+
+    describe 'GET /accounts/new' do
+      it_behaves_like 'a successful GET for a new form' do
+        let(:new_path) { new_account_path }
+      end
+    end
+
+    describe 'POST /accounts' do
+      it 'creates an account and redirects' do
+        expect do
+          post accounts_path, params: {
+            account: { name: 'Cash jar', account_type: 'cash', initial_balance: 12.5 }
+          }
+        end.to change { user.reload.accounts.count }.by(1)
+        expect(response).to redirect_to(accounts_path)
+      end
+    end
+
+    describe 'GET /accounts/:id/edit' do
+      it 'returns success for the user’s account' do
+        account = user.accounts.create!(name: 'Bank', account_type: 'bank', initial_balance: 0)
+        get edit_account_path(account)
+        expect(response).to have_http_status(:ok)
+      end
+
+      it_behaves_like 'a request to edit a missing record' do
+        let(:missing_record_edit_path) { edit_account_path(IMPOSSIBLE_RECORD_ID) }
+      end
+    end
+
+    describe 'PATCH /accounts/:id' do
+      it 'updates the account' do
+        account = user.accounts.create!(name: 'Old', account_type: 'bank', initial_balance: 0)
+        patch account_path(account), params: {
+          account: { name: 'New name', account_type: 'bank', initial_balance: 0 }
+        }
+        expect(response).to redirect_to(accounts_path)
+        expect(account.reload.name).to eq('New name')
+      end
+    end
+
+    describe 'DELETE /accounts/:id' do
+      it 'destroys the account' do
+        account = user.accounts.create!(name: 'Temp', account_type: 'bank', initial_balance: 0)
+        expect do
+          delete account_path(account)
+        end.to change { Account.count }.by(-1)
+        expect(response).to redirect_to(accounts_path)
+      end
+    end
+  end
+end

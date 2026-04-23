@@ -70,6 +70,17 @@ create(:user, email: "user-#{SecureRandom.hex(4)}@example.com") # when uniquenes
 - Do not name support files `*_spec.rb` (they would run as specs).
 - New files in `spec/support` are auto-required from `rails_helper`.
 
+## Shared examples (RSpec) — request specs
+
+- Prefer **`it_behaves_like`** (with shared groups defined in `spec/support/`) for **repeated request-spec behaviour** so examples stay in one place and read consistently across controllers.
+- In this app, see **`spec/support/shared_examples/requests_authentication_and_errors.rb`**, which defines:
+  - **`a request that requires sign-in`** — unauthenticated `GET` (or any `unauthenticated_request` proc) → `redirect_to new_session_path`. The host must set `let(:unauthenticated_request) { proc { get some_path } }`.
+  - **`a request to edit a missing record`** — signed-in `GET` to an edit path for a non-existent id → `redirect_to root_path` (matches `ApplicationController#record_not_found`). The host must set `let(:missing_record_edit_path)`; use `IMPOSSIBLE_RECORD_ID` for the id. **Run inside `context 'when signed in'`** so authentication runs before the controller’s `find`.
+  - **`a successful GET for a new form`** — `GET` `new_path` → `200`. The host must set `let(:new_path) { new_…_path }`.
+- **Other repeated patterns** (not yet extracted; consider a shared group if you add more controllers and copy-paste the same `it` again):
+  - `POST` create → `redirect_to` the resource index; `DELETE` → same; `GET` index → `200` and a page title in the body.
+- When introducing a new shared group, add a **short name**, put it next to the helpers above, and document the **`let` contract** in a one-line comment above the `shared_examples` block.
+
 ## What to avoid
 
 - Leaving `:focus` / `fit` / `fdescribe` committed in shared branches — use locally or via `.rspec-local`.
