@@ -6,6 +6,17 @@ module TransactionsHelper
   FILTER_SEGMENT_BASE =
     "inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
 
+  DATE_RANGE_FILTER_OPTIONS = [
+    ['Last 7 days', 'last_7_days'],
+    ['This month', 'this_month'],
+    ['Last month', 'last_month'],
+    ['Custom range', 'custom']
+  ].freeze
+
+  def transaction_date_range_filter_options
+    DATE_RANGE_FILTER_OPTIONS
+  end
+
   def transactions_filtered_path(**overrides)
     overrides = overrides.symbolize_keys
     reset_page = overrides.delete(:reset_page)
@@ -39,8 +50,15 @@ module TransactionsHelper
     end
   end
 
-  def transaction_date_range_select_classes
-    "block rounded-md border-0 bg-white py-2 pr-8 pl-3 text-sm font-medium text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-white/5 dark:text-white dark:ring-white/10 dark:focus:ring-indigo-500"
+  # Preset and custom are chosen via Turbolinks, not a native <select> (avoids iOS/Chrome
+  # misplacing the OS dropdown inside position: fixed filter sheets with overflow).
+  def transactions_date_range_filter_path(date_range_key)
+    transactions_filtered_path(
+      date_range: date_range_key,
+      reset_page: true,
+      from_date: nil,
+      to_date: nil
+    )
   end
 
   def transaction_type_badge_classes(transaction_type)
