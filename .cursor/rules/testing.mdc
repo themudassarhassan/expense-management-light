@@ -60,9 +60,16 @@ create(:user, email: "user-#{SecureRandom.hex(4)}@example.com") # when uniquenes
 
 ## Hotwire / Turbo
 
-- **System specs** (Capybara + Selenium per Gemfile): assert on visible outcomes — text, elements, path (`have_current_path`). Capybara waits for async updates; avoid arbitrary `sleep`.
+- **System specs** (Capybara; Selenium is available in the Gemfile): assert on **visible** outcomes — text, key elements, `have_current_path` (with `ignore_query: true` when appropriate). Capybara waits for async updates; avoid arbitrary `sleep`.
 - **Request specs**: assert HTTP status and body (including Turbo Stream responses) without a browser.
 - **Stimulus**: prefer system specs for integration unless the project adds a JS unit test runner; do not introduce Jest/Vitest unless the team adds it to the stack.
+
+## System specs (`spec/system`)
+
+- **Scope**: critical **user paths** the browser would hit (auth, creating core records, high-value navigation). Complement request specs, which don’t run the app in a browser.
+- **Driver (this app)**: `spec/support/capybara_system.rb` uses **`driven_by :rack_test`**. That runs the app **in-process** with Capybara, so **transactional examples** and factory data are visible to `visit` without extra DB config. It does **not** execute real browser JavaScript; use **Selenium (e.g. headless Chrome) only** for flows that **require** JS (e.g. a Stimulus controller with no non-JS fallback), and consider database strategies that work with a second process if you switch.
+- **Helpers**: `spec/support/system_spec_helpers.rb` — e.g. `sign_in_as`, `click_sign_out` (layout has duplicate Sign out buttons; helpers encapsulate that).
+- **Stability**: prefer **accessible labels** and stable copy (`has_content` / `select … from: 'Label'`) over brittle CSS paths.
 
 ## Support files
 
