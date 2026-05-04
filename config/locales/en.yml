@@ -29,3 +29,8 @@
 
 en:
   hello: "Hello world"
+
+  date:
+    formats:
+      # Budgets use a calendar month (DB stores first-of-month); hide the day in UI.
+      month_year: "%B %Y"

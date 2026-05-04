@@ -1,0 +1,23 @@
+<% if @pagy.last && @pagy.last > 1 %>
+  <nav class="mt-6 flex flex-col gap-3 border-t border-gray-200 pt-4 dark:border-white/10 sm:flex-row sm:items-center sm:justify-between" aria-label="Transaction pages">
+    <p class="text-center text-sm text-gray-600 dark:text-gray-400 sm:text-left">
+      Page <%= @pagy.page %> of <%= @pagy.last %>
+    </p>
+    <div class="flex gap-3 sm:justify-end">
+      <% if @pagy.previous %>
+        <%= link_to "Newer",
+              budget_path(@budget, page: @pagy.previous),
+              class: "inline-flex min-h-11 flex-1 items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-white/10 dark:text-white dark:ring-white/10 dark:hover:bg-white/15 sm:flex-initial" %>
+      <% else %>
+        <span class="inline-flex min-h-11 flex-1 cursor-not-allowed items-center justify-center rounded-md bg-gray-50 px-4 py-2 text-sm font-semibold text-gray-400 ring-1 ring-inset ring-gray-200 dark:bg-white/5 dark:text-gray-500 dark:ring-white/5 sm:flex-initial">Newer</span>
+      <% end %>
+      <% if @pagy.next %>
+        <%= link_to "Older",
+              budget_path(@budget, page: @pagy.next),
+              class: "inline-flex min-h-11 flex-1 items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-white/10 dark:text-white dark:ring-white/10 dark:hover:bg-white/15 sm:flex-initial" %>
+      <% else %>
+        <span class="inline-flex min-h-11 flex-1 cursor-not-allowed items-center justify-center rounded-md bg-gray-50 px-4 py-2 text-sm font-semibold text-gray-400 ring-1 ring-inset ring-gray-200 dark:bg-white/5 dark:text-gray-500 dark:ring-white/5 sm:flex-initial">Older</span>
+      <% end %>
+    </div>
+  </nav>
+<% end %>

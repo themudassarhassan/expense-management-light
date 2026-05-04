@@ -1,0 +1,59 @@
+<% spent = @budget.spent_amount %>
+<% limit = @budget.amount %>
+<% status = dashboard_budget_status(spent, limit) %>
+<% width = dashboard_budget_bar_width_percent(spent, limit) %>
+<% content_for :mobile_title, @budget.account.name %>
+
+<div class="sm:flex sm:items-start sm:justify-between sm:gap-4">
+  <div class="min-w-0 flex-1">
+    <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+      <%= link_to "← Budgets", budgets_path, class: "#{form_back_link_classes} text-sm" %>
+    </div>
+    <h1 class="mt-2 text-lg font-semibold text-gray-900 dark:text-gray-100 sm:text-xl">
+      <%= @budget.account.name %>
+    </h1>
+    <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+      <%= l(@budget.budget_month, format: :month_year) %>
+    </p>
+  </div>
+  <div class="mt-4 shrink-0 sm:mt-0">
+    <%= link_to "Add transaction", new_transaction_path, class: "inline-flex min-h-11 w-full items-center justify-center rounded-md bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500 dark:hover:bg-indigo-400 dark:focus-visible:outline-indigo-500 sm:w-auto" %>
+  </div>
+</div>
+
+<div class="mt-6 <%= dashboard_card_classes %>">
+  <div class="flex flex-wrap items-end justify-between gap-3">
+    <div>
+      <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Spent this month</p>
+      <p class="mt-1 text-2xl font-semibold tabular-nums text-gray-900 dark:text-white">
+        <%= number_with_delimiter(spent) %>
+        <span class="text-base font-normal text-gray-500 dark:text-gray-400"> / <%= number_with_delimiter(limit) %></span>
+      </p>
+    </div>
+  </div>
+  <div class="mt-4 <%= dashboard_budget_bar_outer_classes(status) %>">
+    <div class="<%= dashboard_budget_bar_inner_classes(status) %>" style="width: <%= width %>%"></div>
+  </div>
+  <p class="mt-3 text-xs text-gray-500 dark:text-gray-400">
+    Listed expenses debit <%= @budget.account.name %> and fall in this calendar month — the same amounts that count toward your budget.
+  </p>
+</div>
+
+<section class="mt-8" aria-labelledby="budget-transactions-heading">
+  <h2 id="budget-transactions-heading" class="text-base font-semibold text-gray-900 dark:text-gray-200">
+    Transactions
+  </h2>
+
+  <% if @pagy.count.positive? %>
+    <div class="mt-4 space-y-3">
+      <%= render partial: "transactions/transaction_card", collection: @transactions, as: :transaction %>
+    </div>
+    <%= render "budgets/transactions_pagination" %>
+  <% else %>
+    <div class="mt-4 rounded-lg border border-dashed border-gray-300 bg-gray-50/80 px-5 py-10 text-center dark:border-white/10 dark:bg-white/5">
+      <p class="text-sm font-medium text-gray-900 dark:text-gray-200">No expenses in this category for this month yet.</p>
+      <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">When you record spending that debits this category in <%= l(@budget.budget_month, format: :month_year) %>, it will show up here.</p>
+      <%= link_to "Add a transaction", new_transaction_path, class: "mt-6 inline-flex min-h-11 items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 dark:bg-indigo-500 dark:hover:bg-indigo-400" %>
+    </div>
+  <% end %>
+</section>

@@ -21,6 +21,14 @@ RSpec.shared_examples 'a request to edit a missing record' do
   end
 end
 
+# Host: `let(:missing_record_show_path)`; use with a signed-in user.
+RSpec.shared_examples 'a request to show a missing record' do
+  it 'redirects to root' do
+    get missing_record_show_path
+    expect(response).to redirect_to(root_path)
+  end
+end
+
 # Host: `let(:new_path) { new_*_path }`
 RSpec.shared_examples 'a successful GET for a new form' do
   it 'returns success' do

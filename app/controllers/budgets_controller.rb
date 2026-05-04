@@ -1,11 +1,22 @@
 # frozen_string_literal: true
 
 class BudgetsController < ApplicationController
-  before_action :set_budget, only: %i[edit update destroy]
+  helper DashboardHelper
+
+  before_action :set_budget, only: %i[show edit update destroy]
   before_action :load_expense_accounts, only: %i[new create edit update]
 
   def index
     @budgets = Current.user.budgets.includes(:account).order(budget_month: :desc)
+  end
+
+  def show
+    scope = @budget.spent_transactions.includes(:credit_account, :debit_account)
+    @pagy, @transactions = pagy(:offset, scope)
+    if budget_show_page_overflow?
+      redirect_to budget_path(@budget, page: @pagy.last)
+      return
+    end
   end
 
   def new
@@ -44,7 +55,11 @@ class BudgetsController < ApplicationController
   end
 
   def set_budget
-    @budget = Budget.find(params[:id])
+    @budget = Current.user.budgets.includes(:account).find(params[:id])
+  end
+
+  def budget_show_page_overflow?
+    @pagy.last && (@pagy.page > @pagy.last)
   end
 
   def budget_params

@@ -21,6 +21,48 @@ RSpec.describe Budget, type: :model do
     end
   end
 
+  describe '#spent_transactions' do
+    it 'returns debits to the budget category in that month, newest first' do
+      user = create(:user)
+      exp = user.accounts.create!(name: 'Exp', account_type: 'expense', initial_balance: 0)
+      bank = user.accounts.create!(name: 'Bank', account_type: 'bank', initial_balance: 0)
+      t1 = create(
+        :transaction,
+        user:,
+        debit_account: exp,
+        credit_account: bank,
+        amount: 10,
+        transaction_date: Date.new(2025, 4, 2)
+      )
+      t2 = create(
+        :transaction,
+        user:,
+        debit_account: exp,
+        credit_account: bank,
+        amount: 20,
+        transaction_date: Date.new(2025, 4, 15)
+      )
+      create(
+        :transaction,
+        user:,
+        debit_account: exp,
+        credit_account: bank,
+        amount: 99,
+        transaction_date: Date.new(2025, 3, 1)
+      )
+
+      budget = create(
+        :budget,
+        user:,
+        account: exp,
+        amount: 500,
+        budget_month: Date.new(2025, 4, 1)
+      )
+
+      expect(budget.spent_transactions.to_a).to eq([t2, t1])
+    end
+  end
+
   describe '#spent_amount' do
     it 'sums amounts for debit transactions to the budget account in that calendar month' do
       user = create(:user)
