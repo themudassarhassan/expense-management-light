@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_01_23_120000) do
+ActiveRecord::Schema[7.1].define(version: 2026_04_24_134615) do
   create_table "accounts", force: :cascade do |t|
     t.string "name", null: false
     t.decimal "initial_balance", precision: 12, scale: 2, default: "0.0", null: false
@@ -61,6 +61,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_23_120000) do
     t.date "transaction_date", null: false
     t.index ["credit_account_id"], name: "index_transactions_on_credit_account_id"
     t.index ["debit_account_id"], name: "index_transactions_on_debit_account_id"
+    t.index ["user_id", "transaction_date"], name: "index_transactions_on_user_id_and_transaction_date"
     t.index ["user_id"], name: "index_transactions_on_user_id"
   end
 

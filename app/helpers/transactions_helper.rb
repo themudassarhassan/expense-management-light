@@ -21,25 +21,103 @@ module TransactionsHelper
     overrides = overrides.symbolize_keys
     reset_page = overrides.delete(:reset_page)
     clear_type = overrides.delete(:clear_type)
+    clear_account = overrides.delete(:clear_account)
+    clear_category = overrides.delete(:clear_category)
     src = request.query_parameters
+    sort_src = (src[:sort].presence || src['sort'].presence).to_s
+    sort_q =
+      if sort_src.present? && sort_src.in?(TransactionsFilter::SORT_KEYS) && sort_src != TransactionsFilter::DEFAULT_SORT
+        sort_src
+      end
+
     q = {
       date_range: src[:date_range].presence || src['date_range'].presence,
       from_date: src[:from_date].presence || src['from_date'].presence,
       to_date: src[:to_date].presence || src['to_date'].presence,
       type: src[:type].presence || src['type'].presence,
-      page: src[:page].presence || src['page'].presence
+      page: src[:page].presence || src['page'].presence,
+      account_id: src[:account_id].presence || src['account_id'].presence,
+      category_id: src[:category_id].presence || src['category_id'].presence,
+      sort: sort_q
     }.compact
 
     overrides.each do |key, val|
       if val.nil?
         q.delete(key)
+      elsif key == :sort && val.to_s == TransactionsFilter::DEFAULT_SORT
+        q.delete(:sort)
       else
         q[key] = val
       end
     end
     q.delete(:type) if clear_type
+    q.delete(:account_id) if clear_account
+    q.delete(:category_id) if clear_category
     q.delete(:page) if reset_page
     transactions_path(q)
+  end
+
+  # Sort order is changed only via Amount/Date column headers on the table (not filter pills).
+  def transactions_sort_header_path(f, column)
+    new_sort =
+      case column.to_sym
+      when :date
+        if f.sort == 'date_desc'
+          'date_asc'
+        elsif f.sort == 'date_asc'
+          'date_desc'
+        else
+          'date_desc'
+        end
+      when :amount
+        if f.sort == 'amount_desc'
+          'amount_asc'
+        elsif f.sort == 'amount_asc'
+          'amount_desc'
+        else
+          'amount_desc'
+        end
+      end
+    if new_sort == TransactionsFilter::DEFAULT_SORT
+      transactions_filtered_path(sort: nil, reset_page: true)
+    else
+      transactions_filtered_path(sort: new_sort, reset_page: true)
+    end
+  end
+
+  def transaction_sort_header_link_classes
+    'group inline-flex items-center gap-1 rounded-md text-sm font-semibold text-gray-900 hover:text-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:text-gray-200 dark:hover:text-indigo-400 dark:focus-visible:outline-indigo-500'
+  end
+
+  def transaction_sort_column_aria_sort(f, column)
+    case column.to_sym
+    when :date
+      return unless f.sort.start_with?('date')
+
+      f.sort == 'date_asc' ? 'ascending' : 'descending'
+    when :amount
+      return unless f.sort.start_with?('amount')
+
+      f.sort == 'amount_asc' ? 'ascending' : 'descending'
+    end
+  end
+
+  def transaction_sort_indicator_visible?(f, column)
+    case column.to_sym
+    when :date
+      f.sort.start_with?('date')
+    when :amount
+      f.sort.start_with?('amount')
+    end
+  end
+
+  def transaction_sort_indicator_rotate_for_asc?(f, column)
+    case column.to_sym
+    when :date
+      f.sort == 'date_asc'
+    when :amount
+      f.sort == 'amount_asc'
+    end
   end
 
   def transaction_filter_segment_classes(active)
@@ -50,8 +128,7 @@ module TransactionsHelper
     end
   end
 
-  # Preset and custom are chosen via Turbolinks, not a native <select> (avoids iOS/Chrome
-  # misplacing the OS dropdown inside position: fixed filter sheets with overflow).
+  # Date presets use link navigation (consistent with other Turbo frame filters).
   def transactions_date_range_filter_path(date_range_key)
     transactions_filtered_path(
       date_range: date_range_key,

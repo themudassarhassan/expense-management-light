@@ -62,6 +62,33 @@ RSpec.describe TransactionsFilter do
       f = described_class.new(user:, params: { page: '2' })
       expect(f).to be_resettable
     end
+
+    it 'is true when sort is not the default' do
+      f = described_class.new(user:, params: { sort: 'date_asc' })
+      expect(f).to be_resettable
+    end
+
+    it 'is true when a valid account filter is set' do
+      bank = create(:account, user:, account_type: 'bank')
+      f = described_class.new(user:, params: { account_id: bank.id.to_s })
+      expect(f).to be_resettable
+    end
+
+    it 'is true when account_id param is invalid' do
+      f = described_class.new(user:, params: { account_id: '999999' })
+      expect(f).to be_resettable
+    end
+  end
+
+  describe '#sort' do
+    it 'defaults to date_desc' do
+      expect(filter.sort).to eq('date_desc')
+    end
+
+    it 'returns allowed sort keys' do
+      f = described_class.new(user:, params: { sort: 'amount_asc' })
+      expect(f.sort).to eq('amount_asc')
+    end
   end
 
   describe '#scope' do
@@ -109,6 +136,116 @@ RSpec.describe TransactionsFilter do
       )
       f = described_class.new(user:, params: { type: 'income' })
       expect(f.scope).to contain_exactly(inc)
+    end
+
+    it 'filters by account when the account is on either side of the flow' do
+      bank1 = create(:account, user:, account_type: 'bank', name: 'One')
+      bank2 = create(:account, user:, account_type: 'bank', name: 'Two')
+      exp = create(:account, user:, account_type: 'expense', name: 'Cat')
+      t_match = create(
+        :transaction,
+        user:,
+        credit_account: bank1,
+        debit_account: exp,
+        transaction_type: 'expense',
+        transaction_date: Date.current,
+        amount: 7
+      )
+      create(
+        :transaction,
+        user:,
+        credit_account: bank2,
+        debit_account: exp,
+        transaction_type: 'expense',
+        transaction_date: Date.current,
+        amount: 8
+      )
+      f = described_class.new(user:, params: { account_id: bank1.id.to_s })
+      expect(f.scope).to contain_exactly(t_match)
+    end
+
+    it 'filters by category for expense and income legs' do
+      bank = create(:account, user:, account_type: 'bank')
+      exp = create(:account, user:, account_type: 'expense', name: 'Food')
+      inc = create(:account, user:, account_type: 'income', name: 'Salary')
+      t_exp = create(
+        :transaction,
+        user:,
+        credit_account: bank,
+        debit_account: exp,
+        transaction_type: 'expense',
+        transaction_date: Date.current,
+        amount: 3
+      )
+      t_inc = create(
+        :transaction,
+        user:,
+        credit_account: inc,
+        debit_account: bank,
+        transaction_type: 'income',
+        transaction_date: Date.current,
+        amount: 4
+      )
+      f1 = described_class.new(user:, params: { category_id: exp.id.to_s })
+      expect(f1.scope).to contain_exactly(t_exp)
+      f2 = described_class.new(user:, params: { category_id: inc.id.to_s })
+      expect(f2.scope).to contain_exactly(t_inc)
+    end
+
+    it 'orders by transaction_date descending by default' do
+      older = create(:account, user:)
+      newer = create(:account, user:)
+      t_old = create(
+        :transaction,
+        user:,
+        debit_account: older,
+        credit_account: newer,
+        transaction_date: Date.new(2024, 1, 1),
+        amount: 1
+      )
+      t_new = create(
+        :transaction,
+        user:,
+        debit_account: newer,
+        credit_account: older,
+        transaction_date: Date.new(2024, 6, 1),
+        amount: 2
+      )
+      f = described_class.new(user:, params: { date_range: 'custom', from_date: '2024-01-01', to_date: '2024-12-31' })
+      expect(f.scope.to_a).to eq([t_new, t_old])
+    end
+
+    it 'orders by amount ascending when sort is amount_asc' do
+      a = create(:account, user:)
+      b = create(:account, user:)
+      t_small = create(
+        :transaction,
+        user:,
+        debit_account: a,
+        credit_account: b,
+        transaction_date: Date.current,
+        amount: 5
+      )
+      t_large = create(
+        :transaction,
+        user:,
+        debit_account: b,
+        credit_account: a,
+        transaction_date: Date.current,
+        amount: 50
+      )
+      f = described_class.new(user:, params: { sort: 'amount_asc' })
+      expect(f.scope.to_a).to eq([t_small, t_large])
+    end
+
+    it 'ignores account_id that does not belong to the user' do
+      other = create(:user)
+      their_bank = create(:account, user: other, account_type: 'bank')
+      mine_a = create(:account, user:)
+      mine_b = create(:account, user:)
+      t = create(:transaction, user:, debit_account: mine_a, credit_account: mine_b, transaction_date: Date.current)
+      f = described_class.new(user:, params: { account_id: their_bank.id.to_s })
+      expect(f.scope).to contain_exactly(t)
     end
   end
 

@@ -30,7 +30,7 @@
       </button>
     </div>
 
-    <div class="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-end sm:gap-6">
+    <div class="flex min-w-0 flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end sm:gap-6">
       <div class="flex min-w-0 flex-col gap-1">
         <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Date range</span>
         <div
@@ -49,6 +49,17 @@
           <%= hidden_field_tag :date_range, "custom" %>
           <% if f.type.present? %>
             <%= hidden_field_tag :type, f.type %>
+          <% end %>
+          <% if params[:account_id].present? %>
+            <%= hidden_field_tag :account_id, params[:account_id] %>
+          <% end %>
+          <% if params[:category_id].present? %>
+            <%= hidden_field_tag :category_id, params[:category_id] %>
+          <% end %>
+          <% if params[:sort].present? %>
+            <%= hidden_field_tag :sort, params[:sort] %>
+          <% elsif f.sort != TransactionsFilter::DEFAULT_SORT %>
+            <%= hidden_field_tag :sort, f.sort %>
           <% end %>
           <div>
             <label for="from_date" class="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">From</label>
@@ -72,6 +83,30 @@
           <%= link_to "Transfer", transactions_filtered_path(type: "transfer", reset_page: true), class: transaction_filter_segment_classes(f.type == "transfer"), data: { turbo_frame: "transactions_index", turbo_action: "advance" } %>
         </div>
       </div>
+
+      <%= form_with url: transactions_path, method: :get, class: "flex min-w-0 flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end sm:gap-4", data: { turbo_frame: "transactions_index", turbo_action: "advance" } do %>
+        <%= hidden_field_tag :date_range, f.date_range %>
+        <% if custom_dates && params[:from_date].present? && params[:to_date].present? %>
+          <%= hidden_field_tag :from_date, params[:from_date] %>
+          <%= hidden_field_tag :to_date, params[:to_date] %>
+        <% end %>
+        <% if f.type.present? %>
+          <%= hidden_field_tag :type, f.type %>
+        <% end %>
+        <% if params[:sort].present? %>
+          <%= hidden_field_tag :sort, params[:sort] %>
+        <% elsif f.sort != TransactionsFilter::DEFAULT_SORT %>
+          <%= hidden_field_tag :sort, f.sort %>
+        <% end %>
+        <div class="flex min-w-0 flex-col gap-1 sm:min-w-[12rem]">
+          <%= label_tag :filter_account_id, "Account", class: "text-xs font-medium text-gray-500 dark:text-gray-400" %>
+          <%= select_tag :account_id, options_for_select([["All accounts", ""]] + f.account_options.map { |a| [a.name, a.id] }, f.account_id), id: "filter_account_id", class: form_control_classes, onchange: "this.form.requestSubmit()" %>
+        </div>
+        <div class="flex min-w-0 flex-col gap-1 sm:min-w-[12rem]">
+          <%= label_tag :filter_category_id, "Category", class: "text-xs font-medium text-gray-500 dark:text-gray-400" %>
+          <%= select_tag :category_id, options_for_select([["All categories", ""]] + f.category_options.map { |a| [a.name, a.id] }, f.category_id), id: "filter_category_id", class: form_control_classes, onchange: "this.form.requestSubmit()" %>
+        </div>
+      <% end %>
     </div>
 
     <% if f.resettable? %>

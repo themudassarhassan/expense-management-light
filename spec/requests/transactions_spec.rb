@@ -37,6 +37,50 @@ RSpec.describe 'Transactions', type: :request do
         expect(response).to have_http_status(:ok)
         expect(response.content_type).to include('text/html')
       end
+
+      it 'returns only transactions for the selected account' do
+        bank1 = user.accounts.create!(name: 'Primary', account_type: 'bank', initial_balance: 0)
+        bank2 = user.accounts.create!(name: 'Secondary', account_type: 'bank', initial_balance: 0)
+        exp = user.accounts.create!(name: 'Cat', account_type: 'expense', initial_balance: 0)
+        create(:transaction, user:, credit_account: bank1, debit_account: exp, amount: 101, transaction_date: Date.current)
+        create(:transaction, user:, credit_account: bank2, debit_account: exp, amount: 102, transaction_date: Date.current)
+        get transactions_path, params: { account_id: bank1.id }
+        expect(response).to have_http_status(:ok)
+        doc = Nokogiri::HTML(response.body)
+        expect(doc.css('#transactions_tbody tr').size).to eq(1)
+        expect(response.body).to include('101')
+        expect(response.body).not_to include('102')
+      end
+
+      it 'includes table header links to toggle sort' do
+        create(
+          :transaction,
+          user:,
+          debit_account: expense,
+          credit_account: bank,
+          transaction_type: 'expense',
+          amount: 3,
+          transaction_date: Date.current
+        )
+        get transactions_path
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to match(/sort=date_asc/)
+        expect(response.body).to match(/sort=amount_desc/)
+      end
+
+      it 'accepts a sort parameter' do
+        create(
+          :transaction,
+          user:,
+          debit_account: expense,
+          credit_account: bank,
+          transaction_type: 'expense',
+          amount: 3,
+          transaction_date: Date.current
+        )
+        get transactions_path, params: { sort: 'amount_asc' }
+        expect(response).to have_http_status(:ok)
+      end
     end
 
     describe 'GET /transactions/new' do

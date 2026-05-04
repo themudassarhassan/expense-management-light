@@ -64,7 +64,7 @@ class TransactionsController < ApplicationController
   end
 
   def filter_params
-    params.permit(:date_range, :from_date, :to_date, :type, :page)
+    params.permit(:date_range, :from_date, :to_date, :type, :page, :account_id, :category_id, :sort)
   end
 
   def transactions_page_overflow?
