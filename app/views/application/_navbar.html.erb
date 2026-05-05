@@ -51,13 +51,15 @@
     </li>
     <li class="-mx-6 mt-auto">
       <div class="space-y-3 px-6 py-3">
-        <div class="flex items-center gap-x-3">
+        <%= link_to edit_profile_path,
+                    class: 'flex items-center gap-x-3 rounded-md px-2 py-2 -mx-2 hover:bg-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white',
+                    'aria-label': 'Profile settings' do %>
           <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-white/10 text-sm font-semibold text-white" aria-hidden="true"><%= nav_user_initials %></span>
           <div class="min-w-0 flex-1">
             <p class="truncate text-sm font-semibold text-white"><%= nav_user_display_name %></p>
             <p class="truncate text-xs text-gray-400">Signed in</p>
           </div>
-        </div>
+        <% end %>
         <%= button_to 'Sign out', session_path, method: :delete, class: nav_sign_out_button_classes %>
       </div>
     </li>

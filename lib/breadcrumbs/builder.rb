@@ -14,7 +14,8 @@ module Breadcrumbs
   REGISTRY = {
     'home' => SectionConfig.new(label: 'Dashboard', index: nil, root_only: true),
     'sessions' => SectionConfig.new(label: 'Sign in', index: nil),
-    'registrations' => SectionConfig.new(label: 'Sign up', index: nil, ivar: :@user)
+    'registrations' => SectionConfig.new(label: 'Sign up', index: nil, ivar: :@user),
+    'profiles' => SectionConfig.new(label: 'Profile', index: nil, ivar: :@user)
   }.freeze
 
   class Builder

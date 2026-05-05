@@ -1,0 +1,9 @@
+<div class="<%= form_page_width_classes %>">
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <h1 class="text-base font-semibold text-gray-900 dark:text-gray-200">Your profile</h1>
+    <%= link_to 'Back to dashboard', root_path, class: form_back_link_classes %>
+  </div>
+  <div class="mt-8">
+    <%= render 'form' %>
+  </div>
+</div>

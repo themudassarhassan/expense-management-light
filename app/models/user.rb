@@ -3,6 +3,8 @@
 class User < ApplicationRecord
   has_secure_password
 
+  attr_accessor :current_password
+
   validates :name, :email, presence: true
   validates :email, uniqueness: true
 

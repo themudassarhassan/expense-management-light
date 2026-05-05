@@ -12,6 +12,7 @@ Rails.application.routes.draw do
 
   resource :registrations, only: %i[new create]
   resource :session, only: %i[new create destroy]
+  resource :profile, only: %i[edit update]
 
   resources :accounts
   resources :transactions

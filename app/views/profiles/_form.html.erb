@@ -1,0 +1,37 @@
+<%= form_with model: @user, url: profile_path, class: "space-y-6 #{form_card_classes}" do |form| %>
+  <%= render "application/form_errors", object: @user %>
+
+  <div class="space-y-6">
+    <div>
+      <%= form.label :name, class: form_label_classes %>
+      <%= form.text_field :name, autocomplete: "name", class: form_control_classes %>
+    </div>
+
+    <div>
+      <span class="<%= form_label_classes %>">Email</span>
+      <p class="mt-1.5 text-sm text-gray-900 dark:text-gray-200"><%= @user.email %></p>
+      <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Email cannot be changed.</p>
+    </div>
+
+    <div>
+      <%= form.label :current_password, 'Current password', class: form_label_classes %>
+      <%= form.password_field :current_password, autocomplete: "current-password", class: form_control_classes %>
+      <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Required when setting a new password.</p>
+    </div>
+
+    <div>
+      <%= form.label :password, 'New password', class: form_label_classes %>
+      <%= form.password_field :password, autocomplete: "new-password", class: form_control_classes %>
+      <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Leave blank to keep your current password.</p>
+    </div>
+
+    <div>
+      <%= form.label :password_confirmation, 'Confirm new password', class: form_label_classes %>
+      <%= form.password_field :password_confirmation, autocomplete: "new-password", class: form_control_classes %>
+    </div>
+
+    <div class="<%= form_secondary_actions_classes %>">
+      <%= form.submit 'Save profile', class: form_submit_classes %>
+    </div>
+  </div>
+<% end %>
