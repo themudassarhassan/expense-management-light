@@ -7,6 +7,7 @@ RSpec.describe AccountBalanceCalculator do
     account = instance_double(
       'Account',
       account_type: 'weird',
+      initial_balance: 0,
       debit_transactions: double('Relation', sum: 0),
       credit_transactions: double('Relation', sum: 0)
     )
@@ -50,5 +51,32 @@ RSpec.describe AccountBalanceCalculator do
       transaction_date: Date.current
     )
     expect(described_class.new(inc.reload).compute).to eq(5000)
+  end
+
+  it 'includes initial_balance for debit-normal accounts' do
+    user = create(:user)
+    bank = user.accounts.create!(name: 'Bank', account_type: 'bank', initial_balance: 50)
+    expect(described_class.new(bank.reload).compute).to eq(50)
+  end
+
+  it 'includes negative initial_balance for person accounts' do
+    user = create(:user)
+    person = user.accounts.create!(name: 'Friend', account_type: 'person', initial_balance: -25)
+    expect(described_class.new(person.reload).compute).to eq(-25)
+  end
+
+  it 'combines negative initial_balance with transactions on person' do
+    user = create(:user)
+    person = user.accounts.create!(name: 'Friend', account_type: 'person', initial_balance: -100)
+    other = user.accounts.create!(name: 'B', account_type: 'bank', initial_balance: 0)
+    create(
+      :transaction,
+      user:,
+      debit_account: person,
+      credit_account: other,
+      amount: 30,
+      transaction_date: Date.current
+    )
+    expect(described_class.new(person.reload).compute).to eq(-70)
   end
 end

@@ -21,10 +21,12 @@ class AccountBalanceCalculator
   private
 
   def calculate_debit_balance
-    account.debit_transactions.sum(:amount) - account.credit_transactions.sum(:amount)
+    baseline = account.initial_balance.to_d
+    baseline + account.debit_transactions.sum(:amount) - account.credit_transactions.sum(:amount)
   end
 
   def calculate_credit_balance
-    account.credit_transactions.sum(:amount) - account.debit_transactions.sum(:amount)
+    baseline = account.initial_balance.to_d
+    baseline + account.credit_transactions.sum(:amount) - account.debit_transactions.sum(:amount)
   end
 end

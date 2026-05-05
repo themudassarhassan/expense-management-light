@@ -58,6 +58,18 @@ RSpec.describe 'Accounts', type: :request do
         expect(response).to redirect_to(accounts_path)
         expect(account.reload.name).to eq('New name')
       end
+
+      it 'rejects changing initial_balance after transactions exist' do
+        bank = user.accounts.create!(name: 'Bank', account_type: 'bank', initial_balance: 10)
+        other = user.accounts.create!(name: 'Cash', account_type: 'cash', initial_balance: 0)
+        create(:transaction, user:, debit_account: bank, credit_account: other, amount: 5)
+
+        patch account_path(bank), params: {
+          account: { name: 'Bank', account_type: 'bank', initial_balance: 999 }
+        }
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(bank.reload.initial_balance).to eq(10)
+      end
     end
 
     describe 'DELETE /accounts/:id' do

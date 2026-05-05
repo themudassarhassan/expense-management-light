@@ -20,7 +20,20 @@
 
   <div>
     <%= form.label :initial_balance, class: form_label_classes %>
-    <%= form.number_field :initial_balance, step: :any, class: "#{form_control_classes} tabular-nums" %>
+    <% initial_locked = @account.persisted? && @account.transactions.exists? %>
+    <%= form.number_field :initial_balance,
+                          step: :any,
+                          class: "#{form_control_classes} tabular-nums",
+                          disabled: initial_locked %>
+    <% if initial_locked %>
+      <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+        Initial balance cannot be changed after this account has transactions. Adjust the balance using transactions instead.
+      </p>
+    <% else %>
+      <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+        For person accounts: use a negative amount if you owe them; positive if they owe you.
+      </p>
+    <% end %>
   </div>
 
   <div class="<%= form_secondary_actions_classes %>">

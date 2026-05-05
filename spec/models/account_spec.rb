@@ -7,7 +7,58 @@ RSpec.describe Account, type: :model do
 
   describe 'validations' do
     it { is_expected.to validate_presence_of(:name) }
-    it { is_expected.to validate_numericality_of(:initial_balance).is_greater_than_or_equal_to(0) }
+
+    context 'when account type is cash or bank (asset)' do
+      subject { build(:account, account_type: 'bank') }
+
+      it { is_expected.to validate_numericality_of(:initial_balance).is_greater_than_or_equal_to(0) }
+    end
+
+    context 'when account type is person' do
+      it 'allows negative initial_balance' do
+        account = build(:account, account_type: 'person', initial_balance: -50, user: create(:user))
+        expect(account).to be_valid
+      end
+
+      it 'still requires initial_balance to be numeric' do
+        account = build(:account, account_type: 'person', initial_balance: 'not-a-number', user: create(:user))
+        expect(account).not_to be_valid
+      end
+    end
+
+    it 'rejects negative initial_balance for a bank account' do
+      account = build(:account, account_type: 'bank', initial_balance: -1)
+      expect(account).not_to be_valid
+    end
+
+    it 'does not allow changing initial_balance after transactions exist' do
+      user = create(:user)
+      bank = user.accounts.create!(name: 'Bank', account_type: 'bank', initial_balance: 10)
+      other = user.accounts.create!(name: 'Cash', account_type: 'cash', initial_balance: 0)
+      create(:transaction, user:, debit_account: bank, credit_account: other, amount: 5)
+
+      bank.initial_balance = 99
+      expect(bank).not_to be_valid
+      expect(bank.errors[:initial_balance]).to include('cannot be changed after transactions exist')
+    end
+
+    it 'allows changing initial_balance when there are no transactions yet' do
+      user = create(:user)
+      bank = user.accounts.create!(name: 'Bank', account_type: 'bank', initial_balance: 10)
+
+      bank.initial_balance = 20
+      expect(bank).to be_valid
+    end
+
+    it 'allows updating name while initial_balance unchanged after transactions exist' do
+      user = create(:user)
+      bank = user.accounts.create!(name: 'Bank', account_type: 'bank', initial_balance: 10)
+      other = user.accounts.create!(name: 'Cash', account_type: 'cash', initial_balance: 0)
+      create(:transaction, user:, debit_account: bank, credit_account: other, amount: 5)
+
+      bank.name = 'Renamed'
+      expect(bank).to be_valid
+    end
 
     it 'rejects a non-enum account_type' do
       # String enum blocks invalid values (before inclusion runs); use assert_raises-style expectation.
@@ -119,6 +170,35 @@ RSpec.describe Account, type: :model do
       expect(bank.reload.current_balance).to eq(70)
     end
 
+    it 'includes initial_balance for an asset account' do
+      user = create(:user)
+      bank = user.accounts.create!(name: 'Bank', account_type: 'bank', initial_balance: 100)
+      other = user.accounts.create!(name: 'Other', account_type: 'cash', initial_balance: 0)
+      create(
+        :transaction,
+        user: user,
+        debit_account: bank,
+        credit_account: other,
+        amount: 100
+      )
+      create(
+        :transaction,
+        user: user,
+        debit_account: other,
+        credit_account: bank,
+        amount: 30
+      )
+
+      expect(bank.reload.current_balance).to eq(170)
+    end
+
+    it 'includes negative initial_balance for a person account' do
+      user = create(:user)
+      person = user.accounts.create!(name: 'Alice', account_type: 'person', initial_balance: -40)
+
+      expect(person.reload.current_balance).to eq(-40)
+    end
+
     it 'for an expense account, is credit total minus debit total' do
       user = create(:user)
       bank = user.accounts.create!(name: 'Bank', account_type: 'bank', initial_balance: 0)
@@ -132,6 +212,21 @@ RSpec.describe Account, type: :model do
       )
 
       expect(expense.reload.current_balance).to eq(25)
+    end
+
+    it 'includes initial_balance for an expense account' do
+      user = create(:user)
+      bank = user.accounts.create!(name: 'Bank', account_type: 'bank', initial_balance: 0)
+      expense = user.accounts.create!(name: 'Groceries', account_type: 'expense', initial_balance: 10)
+      create(
+        :transaction,
+        user: user,
+        debit_account: bank,
+        credit_account: expense,
+        amount: 25
+      )
+
+      expect(expense.reload.current_balance).to eq(35)
     end
   end
 

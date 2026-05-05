@@ -26,7 +26,7 @@ RSpec.describe 'Budgets', type: :request do
       it 'renders pagination when there is more than one page of expenses' do
         budget = user.budgets.create!(amount: 500, budget_month: month, account: expense_account)
         bank = user.accounts.create!(name: 'Bank', account_type: 'bank', initial_balance: 0)
-        5.times do |i|
+        Pagy::DEFAULT[:limit].times do |i|
           create(
             :transaction,
             user:,
@@ -37,6 +37,15 @@ RSpec.describe 'Budgets', type: :request do
             transaction_date: month + i.days
           )
         end
+        create(
+          :transaction,
+          user:,
+          debit_account: expense_account,
+          credit_account: bank,
+          amount: 10,
+          transaction_type: 'expense',
+          transaction_date: month + Pagy::DEFAULT[:limit].days
+        )
 
         get budget_path(budget)
         expect(response).to have_http_status(:ok)
