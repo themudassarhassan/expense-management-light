@@ -36,6 +36,12 @@
     <% end %>
   </div>
 
+  <div>
+    <%= form.label :currency_code, 'Currency', class: form_label_classes %>
+    <%= form.select :currency_code, CurrencyOptions.options_for_select, {}, { class: form_control_classes } %>
+    <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Balances display in this currency for this account.</p>
+  </div>
+
   <div class="<%= form_secondary_actions_classes %>">
     <%= form.submit class: form_submit_classes %>
   </div>

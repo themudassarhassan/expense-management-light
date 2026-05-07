@@ -1,29 +1,39 @@
 <% m = dashboard.metrics %>
+<% user = dashboard.user %>
 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
   <div class="<%= dashboard_card_classes %>">
     <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total balance</p>
     <p class="mt-2 text-2xl font-bold tabular-nums tracking-tight text-gray-900 dark:text-white">
-      <%= number_with_delimiter(m.total_balance) %>
+      <% total_base = m.total_balance %>
+      <% if total_base.nil? %>
+        <span aria-label="Unavailable">—</span>
+      <% else %>
+        <%= format_money(total_base, user.base_currency) %>
+      <% end %>
     </p>
-    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Cash, bank &amp; person accounts</p>
+    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Cash, bank &amp; person accounts (in <%= user.base_currency %>)</p>
+    <% if total_base.nil? %>
+      <p class="mt-1 text-xs text-amber-700 dark:text-amber-300">Exchange rates unavailable; totals could not be converted.</p>
+    <% end %>
   </div>
   <div class="<%= dashboard_card_classes %>">
     <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Income this month</p>
     <p class="mt-2 text-xl font-semibold tabular-nums text-emerald-600 dark:text-emerald-400">
-      <%= number_with_delimiter(m.monthly_income) %>
+      <%= format_money(m.monthly_income, user.base_currency) %>
     </p>
   </div>
   <div class="<%= dashboard_card_classes %>">
     <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Expenses this month</p>
     <p class="mt-2 text-xl font-semibold tabular-nums text-red-600 dark:text-red-400">
-      <%= number_with_delimiter(m.monthly_expense) %>
+      <%= format_money(m.monthly_expense, user.base_currency) %>
     </p>
   </div>
   <div class="<%= dashboard_card_classes %>">
     <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Net this month</p>
     <% net = m.monthly_net %>
     <p class="mt-2 text-xl font-semibold tabular-nums <%= net >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400' %>">
-      <%= number_with_delimiter(net) %>
+      <%= format_money(net, user.base_currency) %>
     </p>
+    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Raw sums — mixed-currency months may distort this.</p>
   </div>
 </div>

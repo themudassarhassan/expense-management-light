@@ -13,10 +13,11 @@
         <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
           <div class="overflow-hidden shadow-sm outline-1 outline-black/5 sm:rounded-lg dark:shadow-none dark:-outline-offset-1 dark:outline-white/10">
             <table class="relative min-w-full divide-y divide-gray-300 dark:divide-white/15">
-              <thead class="bg-gray-50 dark:bg-gray-800/75">
+                <thead class="bg-gray-50 dark:bg-gray-800/75">
                 <tr>
                   <th scope="col" class="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-6 dark:text-gray-200">Name</th>
                   <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">Account type</th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">Currency</th>
                   <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">Balance</th>
                   <th scope="col" class="py-3.5 pr-4 pl-3 text-right text-sm font-semibold text-gray-900 sm:pr-6 dark:text-gray-200">
                     <span class="sr-only">Actions</span>
@@ -28,7 +29,8 @@
                   <tr>
                     <td class="py-4 pr-3 pl-4 text-sm font-medium whitespace-nowrap text-gray-900 sm:pl-6 dark:text-white"><%= account.name %></td>
                     <td class="px-3 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400"><%= account.account_type.titleize %></td>
-                    <td class="px-3 py-4 text-sm whitespace-nowrap tabular-nums text-gray-900 dark:text-white"><%= number_with_delimiter(account.current_balance) %></td>
+                    <td class="px-3 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400"><%= account.currency_code %></td>
+                    <td class="px-3 py-4 text-sm whitespace-nowrap tabular-nums text-gray-900 dark:text-white"><%= format_money(account.current_balance, account.currency_code) %></td>
                     <td class="py-4 pr-4 pl-3 text-right text-sm whitespace-nowrap sm:pr-6" data-turbo-prefetch="false">
                       <%= link_to "Edit", edit_account_path(account), class: "text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300" %>
                       <span class="text-gray-300 dark:text-gray-600" aria-hidden="true"> · </span>

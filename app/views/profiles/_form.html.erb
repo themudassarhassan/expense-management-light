@@ -14,6 +14,12 @@
     </div>
 
     <div>
+      <%= form.label :base_currency, 'Base currency', class: form_label_classes %>
+      <%= form.select :base_currency, CurrencyOptions.options_for_select, {}, { class: form_control_classes } %>
+      <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Dashboard totals combine accounts in this currency.</p>
+    </div>
+
+    <div>
       <%= form.label :current_password, 'Current password', class: form_label_classes %>
       <%= form.password_field :current_password, autocomplete: "current-password", class: form_control_classes %>
       <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Required when setting a new password.</p>

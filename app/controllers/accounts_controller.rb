@@ -9,6 +9,7 @@ class AccountsController < ApplicationController
 
   def new
     @account = Account.new
+    @account.currency_code ||= Current.user.base_currency
   end
 
   def edit; end
@@ -44,6 +45,6 @@ class AccountsController < ApplicationController
   end
 
   def account_params
-    params.require(:account).permit(:name, :initial_balance, :account_type)
+    params.require(:account).permit(:name, :initial_balance, :account_type, :currency_code)
   end
 end

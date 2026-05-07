@@ -7,6 +7,7 @@ class User < ApplicationRecord
 
   validates :name, :email, presence: true
   validates :email, uniqueness: true
+  validates :base_currency, inclusion: { in: CurrencyOptions::CODES }
 
   has_many :sessions, dependent: :destroy
   has_many :accounts, dependent: :destroy

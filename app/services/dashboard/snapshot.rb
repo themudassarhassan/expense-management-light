@@ -28,9 +28,9 @@ module Dashboard
                                  .to_a
     end
 
-    # [[account, balance], ...] — balances computed once per account for overview + % share.
+    # [[account, native_balance], …] — balances in each account’s currency.
     def overview_accounts_with_balances
-      @overview_accounts_with_balances ||= overview_accounts.map { |a| [a, a.current_balance] }
+      @overview_accounts_with_balances ||= overview_accounts.map { |a| [a, a.current_balance.to_d] }
     end
 
     def month_budgets
@@ -53,7 +53,30 @@ module Dashboard
       pairs = overview_accounts_with_balances
       return if pairs.empty?
 
-      pairs.max_by { |(_, bal)| bal.to_d }&.first&.id
+      pairs.max_by { |account, bal| rank_balance(account, bal) }&.first&.id
+    end
+
+    # Denominator for "% of total" bars: sum of converted absolute balances in user base currency,
+    # falling back to native abs if FX is unavailable.
+    def overview_converted_total_abs
+      overview_accounts_with_balances.sum { |account, bal| rank_balance(account, bal).abs.to_d }
+    end
+
+    # Comparable weight in base currency for share % (non-negative).
+    def share_weight(account, native_balance)
+      rank_balance(account, native_balance).abs
+    end
+
+    private
+
+    def rank_balance(account, native_balance)
+      Fx::CurrencyConverter.convert(
+        native_balance.to_d,
+        from: account.currency_code,
+        to: user.base_currency
+      )
+    rescue Fx::UnavailableError
+      native_balance.to_d
     end
   end
 end

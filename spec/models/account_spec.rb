@@ -7,6 +7,7 @@ RSpec.describe Account, type: :model do
 
   describe 'validations' do
     it { is_expected.to validate_presence_of(:name) }
+    it { is_expected.to validate_inclusion_of(:currency_code).in_array(CurrencyOptions::CODES) }
 
     context 'when account type is cash or bank (asset)' do
       subject { build(:account, account_type: 'bank') }

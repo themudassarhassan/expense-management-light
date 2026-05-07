@@ -1,10 +1,18 @@
 <% type = transaction.transaction_type.to_sym %>
-<%= form_with model: transaction.becomes(Transaction), class: form_card_classes do |form| %>
+<%= form_with model: transaction.becomes(Transaction),
+              class: form_card_classes,
+              html: {
+                'data-controller' => 'transaction-amount-currency',
+                'data-transaction-amount-currency-mapping-value' => (@account_currency_map || {}).to_json
+              } do |form| %>
   <%= render "application/form_errors", object: transaction %>
 
   <div>
-    <%= form.label :amount, class: form_label_classes %>
+    <%= form.label :amount, class: form_label_classes do %>
+      Amount <span data-transaction-amount-currency-target="suffix" class="text-gray-600 dark:text-gray-400 tabular-nums"></span>
+    <% end %>
     <%= form.number_field :amount, step: :any, class: "#{form_control_classes} tabular-nums" %>
+    <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Amount is denominated in your wallet/bank currency for expense and transfer (“From”), or the destination account currency for income.</p>
   </div>
 
   <% unless transaction.persisted? %>

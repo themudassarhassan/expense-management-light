@@ -3,11 +3,11 @@
 module Dashboard
   # Headline numbers for the dashboard. See Dashboard::Snapshot for usage.
   #
-  # Total balance: sum of current_balance for asset + person accounts only (cash, bank, person).
-  # Category ledgers (expense/income account types) are excluded — they are not "money on hand".
+  # Total balance in base currency: sum of current_balance for asset + person accounts,
+  # each converted to User#base_currency via Frankfurter (cached).
+  # Category ledgers are excluded (same as before).
   #
-  # Monthly income / expense: sums for transaction_date in the given calendar month, types
-  # income and expense only (transfers excluded). Net = income - expense.
+  # Monthly income / expense sums are still raw transaction amounts (mixed-currency caveat).
   class Metrics
     OVERVIEW_ACCOUNT_TYPES = (Account::ASSET_TYPES + [Account::PERSON_TYPE]).freeze
 
@@ -19,7 +19,15 @@ module Dashboard
     end
 
     def total_balance
-      user.accounts.where(account_type: OVERVIEW_ACCOUNT_TYPES).sum(&:current_balance)
+      user.accounts.where(account_type: OVERVIEW_ACCOUNT_TYPES).inject(BigDecimal('0')) do |sum, account|
+        sum + Fx::CurrencyConverter.convert(
+          account.current_balance.to_d,
+          from: account.currency_code,
+          to: user.base_currency
+        )
+      end
+    rescue Fx::UnavailableError
+      nil
     end
 
     def monthly_income
@@ -38,12 +46,12 @@ module Dashboard
 
     def monthly_type_totals
       @monthly_type_totals ||= user.transactions
-        .where(transaction_date: month_start.all_month)
-        .where(transaction_type: %w[income expense])
-        .group(:transaction_type)
-        .sum(:amount)
-        .transform_keys(&:to_s)
-        .transform_values { |v| BigDecimal(v.to_s) }
+                                   .where(transaction_date: month_start.all_month)
+                                   .where(transaction_type: %w[income expense])
+                                   .group(:transaction_type)
+                                   .sum(:amount)
+                                   .transform_keys(&:to_s)
+                                   .transform_values { |v| BigDecimal(v.to_s) }
     end
   end
 end

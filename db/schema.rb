@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_04_24_134615) do
+ActiveRecord::Schema[7.1].define(version: 2026_05_05_200000) do
   create_table "accounts", force: :cascade do |t|
     t.string "name", null: false
     t.decimal "initial_balance", precision: 12, scale: 2, default: "0.0", null: false
@@ -19,6 +19,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_24_134615) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "user_id"
+    t.string "currency_code", default: "PKR", null: false
     t.index ["user_id"], name: "index_accounts_on_user_id"
   end
 
@@ -71,6 +72,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_24_134615) do
     t.string "password_digest", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "base_currency", default: "PKR", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 

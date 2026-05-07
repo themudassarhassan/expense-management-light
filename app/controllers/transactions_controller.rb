@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
 class TransactionsController < ApplicationController
+  before_action :assign_account_currency_map!, only: %i[new create edit update]
   before_action :set_transaction, only: %i[edit update destroy]
 
   def index
     @transactions_filter = TransactionsFilter.new(user: Current.user, params: filter_params)
-    @any_transactions = Transaction.where(user: Current.user).exists?
+    @any_transactions = Transaction.exists?(user: Current.user)
     scope = @transactions_filter.scope
     @pagy, @transactions = pagy(:offset, scope)
     redirect_to transactions_path(request.query_parameters.merge(page: @pagy.last)) if transactions_page_overflow?
@@ -31,7 +32,7 @@ class TransactionsController < ApplicationController
     @transaction = Transaction.new(transaction_params.merge(user: Current.user))
 
     if @transaction.save
-      redirect_to transactions_path, notice: "Transaction saved."
+      redirect_to transactions_path, notice: 'Transaction saved.'
     else
       render :new, status: :unprocessable_entity
     end
@@ -52,6 +53,11 @@ class TransactionsController < ApplicationController
   end
 
   private
+
+  def assign_account_currency_map!
+    scope = Account.where(user_id: Current.user.id).or(Account.where(system_generated: true))
+    @account_currency_map = scope.distinct.pluck(:id, :currency_code).to_h.transform_keys(&:to_s)
+  end
 
   def set_transaction
     @transaction = Transaction.find(params[:id])

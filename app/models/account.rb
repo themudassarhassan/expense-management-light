@@ -11,6 +11,7 @@ class Account < ApplicationRecord
   validates :initial_balance, numericality: { greater_than_or_equal_to: 0 }, unless: :person?
   validates :initial_balance, numericality: true, if: :person?
   validates :name, presence: true
+  validates :currency_code, inclusion: { in: CurrencyOptions::CODES }
   validates :account_type, inclusion: { in: TYPES }
   validates :user_id, presence: true, unless: :system_generated
 

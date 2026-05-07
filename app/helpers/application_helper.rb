@@ -5,7 +5,7 @@ module ApplicationHelper
   NAV_LINK_INACTIVE = 'text-gray-400 hover:bg-white/5 hover:text-white'
   NAV_LINK_ACTIVE = 'bg-white/5 text-white'
 
-  def nav_link_to(path, prefix_match: false, match: nil, **options, &block)
+  def nav_link_to(path, prefix_match: false, match: nil, **options, &)
     is_active =
       if match.respond_to?(:call)
         match.call
@@ -19,7 +19,7 @@ module ApplicationHelper
     extra_class = options.delete(:class)
     link_classes = [NAV_LINK_BASE, state, extra_class].compact.join(' ')
 
-    link_to path, options.merge(class: link_classes), &block
+    link_to(path, options.merge(class: link_classes), &)
   end
 
   def form_page_width_classes
@@ -99,5 +99,24 @@ module ApplicationHelper
       "#{base} bg-indigo-600 text-white hover:bg-indigo-500"
     end
   end
-end
 
+  # ISO 4217 friendly display — see CurrencyOptions::CODES for allowed codes.
+  CURRENCY_UNITS = {
+    'PKR' => '₨ ',
+    'USD' => '$',
+    'EUR' => '€',
+    'GBP' => '£',
+    'AED' => 'د.إ ',
+    'CAD' => 'CA$',
+    'AUD' => 'A$',
+    'JPY' => '¥',
+    'CHF' => 'CHF '
+  }.freeze
+
+  def format_money(amount, currency_code)
+    code = currency_code.to_s.upcase
+    precision = code == 'JPY' ? 0 : 2
+    unit = CURRENCY_UNITS.fetch(code, "#{code} ")
+    number_to_currency(amount, unit:, precision:, format: '%u%n')
+  end
+end

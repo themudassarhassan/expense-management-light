@@ -1,5 +1,5 @@
 <% pairs = dashboard.overview_accounts_with_balances %>
-<% total_abs = dashboard_overview_balance_total_abs(pairs) %>
+<% total_abs = dashboard.overview_converted_total_abs %>
 <% top_id = dashboard.highest_balance_account_id %>
 
 <div class="<%= dashboard_card_classes %>">
@@ -18,13 +18,15 @@
           <%= link_to edit_account_path(account), class: "flex items-center justify-between gap-4 py-3 #{'rounded-lg bg-indigo-50/80 px-2 -mx-2 ring-1 ring-indigo-100 dark:bg-indigo-500/10 dark:ring-indigo-500/20' if account.id == top_id}", data: { turbo_frame: "_top" } do %>
             <div class="min-w-0">
               <p class="font-medium text-gray-900 dark:text-white"><%= account.name %></p>
-              <% pct = dashboard_account_share_percent(balance, total_abs) %>
+              <% weight = dashboard.share_weight(account, balance) %>
+              <% pct = dashboard_account_share_percent(weight, total_abs) %>
               <% if pct.present? %>
                 <p class="text-xs text-gray-500 dark:text-gray-400"><%= pct %>% of total (by magnitude)</p>
               <% end %>
+              <p class="text-xs text-gray-400 dark:text-gray-500"><%= account.currency_code %></p>
             </div>
             <span class="shrink-0 text-sm font-semibold tabular-nums text-gray-900 dark:text-white">
-              <%= number_with_delimiter(balance) %>
+              <%= format_money(balance, account.currency_code) %>
             </span>
           <% end %>
         </li>

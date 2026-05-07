@@ -18,10 +18,17 @@ RSpec.describe 'Profiles', type: :request do
         expect(response).to have_http_status(:ok)
         expect(response.body).to include('Your profile')
         expect(response.body).to include(user.email)
+        expect(response.body).to include('Base currency')
       end
     end
 
     describe 'PATCH /profile' do
+      it 'updates base currency' do
+        patch profile_path, params: { user: { name: user.name, base_currency: 'USD' } }
+        expect(response).to redirect_to(edit_profile_path)
+        expect(user.reload.base_currency).to eq('USD')
+      end
+
       it 'updates the name when password fields are omitted' do
         patch profile_path, params: { user: { name: 'Updated Name' } }
         expect(response).to redirect_to(edit_profile_path)

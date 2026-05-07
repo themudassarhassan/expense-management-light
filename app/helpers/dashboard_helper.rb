@@ -44,13 +44,9 @@ module DashboardHelper
     [[spent.to_d / limit.to_d * 100, 100].min, 0].max.to_f
   end
 
-  def dashboard_account_share_percent(balance, total_abs)
+  def dashboard_account_share_percent(weight, total_abs)
     return if total_abs.blank? || total_abs.to_d.zero?
 
-    ((balance.to_d.abs / total_abs.to_d) * 100).round(1)
-  end
-
-  def dashboard_overview_balance_total_abs(pairs)
-    pairs.sum { |_, bal| bal.to_d.abs }
+    ((weight.to_d.abs / total_abs.to_d) * 100).round(1)
   end
 end

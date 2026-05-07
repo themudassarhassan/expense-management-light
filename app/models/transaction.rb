@@ -6,6 +6,8 @@ class Transaction < ApplicationRecord
   validates :amount, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :transaction_type, inclusion: { in: TYPES }
 
+  validate :matching_account_currencies
+
   belongs_to :user
 
   belongs_to :credit_account, class_name: 'Account'
@@ -18,4 +20,25 @@ class Transaction < ApplicationRecord
   def set_default
     self.transaction_type ||= 'expense'
   end
+
+  private
+
+  # rubocop:disable Metrics/CyclomaticComplexity
+  def matching_account_currencies
+    debit_acc = debit_account
+    credit_acc = credit_account
+    return if debit_acc.blank? || credit_acc.blank?
+
+    if debit_acc.system_generated? && credit_acc.system_generated?
+      errors.add(:base, 'cannot transfer between system-generated categories')
+      return
+    end
+
+    return if debit_acc.system_generated? || credit_acc.system_generated?
+
+    return if debit_acc.currency_code == credit_acc.currency_code
+
+    errors.add(:base, 'debit and credit accounts must share the same currency')
+  end
+  # rubocop:enable Metrics/CyclomaticComplexity
 end
