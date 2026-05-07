@@ -24,7 +24,7 @@ class Account < ApplicationRecord
   has_many :debit_transactions, class_name: 'Transaction', foreign_key: :debit_account_id, dependent: :destroy,
                                 inverse_of: :debit_account
 
-  enum account_type: TYPES.index_by(&:itself)
+  enum :account_type, TYPES.index_by(&:itself)
 
   scope :person_accounts, -> { where(account_type: PERSON_TYPE) }
   scope :asset_accounts, -> { where(account_type: ASSET_TYPES) }
