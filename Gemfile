@@ -22,6 +22,9 @@ gem 'importmap-rails'
 # Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
 gem 'turbo-rails'
 
+# Add HTTP asset caching/compression and X-Sendfile acceleration to Puma [https://github.com/basecamp/thruster/]
+gem 'thruster', require: false
+
 # For styling views using TailwindCSS
 gem 'tailwindcss-rails', '~> 2.6'
 
