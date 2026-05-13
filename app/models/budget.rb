@@ -6,6 +6,8 @@ class Budget < ApplicationRecord
   validates :amount, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :budget_month, presence: true
 
+  validate :account_must_be_permitted_expense_category
+
   belongs_to :user
   belongs_to :account
 
@@ -22,6 +24,18 @@ class Budget < ApplicationRecord
   end
 
   private
+
+  def account_must_be_permitted_expense_category
+    return if account.blank?
+
+    unless account.expense?
+      errors.add(:account, :invalid)
+      return
+    end
+
+    permitted = account.system_generated? || account.user_id == user_id
+    errors.add(:account, :invalid) unless permitted
+  end
 
   def normalize_budget_month
     self.budget_month = budget_month.beginning_of_month if budget_month.present?

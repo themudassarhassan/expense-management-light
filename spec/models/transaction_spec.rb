@@ -13,6 +13,42 @@ RSpec.describe Transaction, type: :model do
     it { is_expected.to belong_to(:user) }
     it { is_expected.to belong_to(:credit_account).class_name('Account') }
     it { is_expected.to belong_to(:debit_account).class_name('Account') }
+
+    context 'when accounts are not owned by the user or system-generated' do
+      it 'is invalid when the debit account belongs to someone else' do
+        u1 = create(:user)
+        u2 = create(:user)
+        mine = create(:account, user: u1)
+        foreign = create(:account, user: u2)
+        tx = build(:transaction, user: u1, debit_account: foreign, credit_account: mine)
+        expect(tx).not_to be_valid
+        expect(tx.errors).to include(:debit_account)
+      end
+
+      it 'is invalid when the credit account belongs to someone else' do
+        u1 = create(:user)
+        u2 = create(:user)
+        mine = create(:account, user: u1)
+        foreign = create(:account, user: u2)
+        tx = build(:transaction, user: u1, debit_account: mine, credit_account: foreign)
+        expect(tx).not_to be_valid
+        expect(tx.errors).to include(:credit_account)
+      end
+
+      it 'is valid when using a system-generated category account' do
+        u = create(:user)
+        bank = create(:account, user: u)
+        system_cat = create(:account, :system_expense)
+        tx = build(
+          :transaction,
+          user: u,
+          debit_account: system_cat,
+          credit_account: bank,
+          transaction_type: 'expense'
+        )
+        expect(tx).to be_valid
+      end
+    end
   end
 
   describe 'after_initialize' do

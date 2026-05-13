@@ -107,6 +107,27 @@ RSpec.describe 'Budgets', type: :request do
         end.to change { user.reload.budgets.count }.by(1)
         expect(response).to redirect_to(budgets_path)
       end
+
+      it 'rejects another user expense account' do
+        other = create(:user)
+        other_expense = other.accounts.create!(name: 'Other', account_type: 'expense', initial_balance: 0)
+        expect do
+          post budgets_path, params: {
+            budget: { amount: 150, budget_month: month, account_id: other_expense.id }
+          }
+        end.not_to change { Budget.count }
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+
+      it 'rejects a non-expense account' do
+        bank = user.accounts.create!(name: 'Bank', account_type: 'bank', initial_balance: 0)
+        expect do
+          post budgets_path, params: {
+            budget: { amount: 150, budget_month: month, account_id: bank.id }
+          }
+        end.not_to change { Budget.count }
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
     end
 
     describe 'GET /budgets/:id/edit' do
@@ -114,6 +135,14 @@ RSpec.describe 'Budgets', type: :request do
         budget = user.budgets.create!(amount: 100, budget_month: month, account: expense_account)
         get edit_budget_path(budget)
         expect(response).to have_http_status(:ok)
+      end
+
+      it 'does not load another user budget' do
+        other = create(:user)
+        other_expense = other.accounts.create!(name: 'O', account_type: 'expense', initial_balance: 0)
+        budget = other.budgets.create!(amount: 50, budget_month: month, account: other_expense)
+        get edit_budget_path(budget)
+        expect(response).to redirect_to(root_path)
       end
 
       it_behaves_like 'a request to edit a missing record' do
@@ -129,6 +158,17 @@ RSpec.describe 'Budgets', type: :request do
         }
         expect(response).to redirect_to(budgets_path)
         expect(budget.reload.amount).to eq(200)
+      end
+
+      it 'does not reassign the budget to another user expense account' do
+        budget = user.budgets.create!(amount: 100, budget_month: month, account: expense_account)
+        other = create(:user)
+        other_expense = other.accounts.create!(name: 'Stolen', account_type: 'expense', initial_balance: 0)
+        patch budget_path(budget), params: {
+          budget: { amount: 100, budget_month: month, account_id: other_expense.id }
+        }
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(budget.reload.account_id).to eq(expense_account.id)
       end
     end
 

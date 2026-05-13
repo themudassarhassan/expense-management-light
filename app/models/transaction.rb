@@ -6,12 +6,12 @@ class Transaction < ApplicationRecord
   validates :amount, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :transaction_type, inclusion: { in: TYPES }
 
-  validate :matching_account_currencies
-
   belongs_to :user
-
   belongs_to :credit_account, class_name: 'Account'
   belongs_to :debit_account, class_name: 'Account'
+
+  validate :debit_and_credit_accounts_must_be_accessible_to_user
+  validate :matching_account_currencies
 
   after_initialize :set_default, if: :new_record?
 
@@ -22,6 +22,17 @@ class Transaction < ApplicationRecord
   end
 
   private
+
+  def debit_and_credit_accounts_must_be_accessible_to_user
+    return if user.blank?
+
+    errors.add(:debit_account, :invalid) if debit_account.present? && !account_accessible_to_user?(debit_account)
+    errors.add(:credit_account, :invalid) if credit_account.present? && !account_accessible_to_user?(credit_account)
+  end
+
+  def account_accessible_to_user?(acc)
+    acc.user_id == user.id || acc.system_generated?
+  end
 
   # rubocop:disable Metrics/CyclomaticComplexity
   def matching_account_currencies

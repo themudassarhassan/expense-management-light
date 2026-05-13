@@ -11,6 +11,32 @@ RSpec.describe Budget, type: :model do
     it { is_expected.to validate_numericality_of(:amount).is_greater_than_or_equal_to(0) }
     it { is_expected.to belong_to(:user) }
     it { is_expected.to belong_to(:account) }
+
+    describe 'account category' do
+      it 'requires an expense account owned by the user or system-generated' do
+        u1 = create(:user)
+        u2 = create(:user)
+        foreign_exp = u2.accounts.create!(name: 'X', account_type: 'expense', initial_balance: 0)
+        budget = build(:budget, user: u1, account: foreign_exp)
+        expect(budget).not_to be_valid
+        expect(budget.errors).to include(:account)
+      end
+
+      it 'rejects a bank account' do
+        user = create(:user)
+        bank = user.accounts.create!(name: 'B', account_type: 'bank', initial_balance: 0)
+        budget = build(:budget, user:, account: bank)
+        expect(budget).not_to be_valid
+        expect(budget.errors).to include(:account)
+      end
+
+      it 'allows a system-generated expense account' do
+        user = create(:user)
+        sys = create(:account, :system_expense)
+        budget = build(:budget, user:, account: sys)
+        expect(budget).to be_valid
+      end
+    end
   end
 
   describe 'normalizing budget_month' do

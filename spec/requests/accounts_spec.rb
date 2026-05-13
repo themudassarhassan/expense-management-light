@@ -44,6 +44,12 @@ RSpec.describe 'Accounts', type: :request do
         expect(response).to have_http_status(:ok)
       end
 
+      it 'does not load another user account' do
+        other_account = create(:user).accounts.create!(name: 'Other', account_type: 'bank', initial_balance: 0)
+        get edit_account_path(other_account)
+        expect(response).to redirect_to(root_path)
+      end
+
       it_behaves_like 'a request to edit a missing record' do
         let(:missing_record_edit_path) { edit_account_path(IMPOSSIBLE_RECORD_ID) }
       end
@@ -57,6 +63,15 @@ RSpec.describe 'Accounts', type: :request do
         }
         expect(response).to redirect_to(accounts_path)
         expect(account.reload.name).to eq('New name')
+      end
+
+      it 'does not update another user account' do
+        other_account = create(:user).accounts.create!(name: 'Victim', account_type: 'bank', initial_balance: 0)
+        patch account_path(other_account), params: {
+          account: { name: 'Hacked', account_type: 'bank', initial_balance: 0 }
+        }
+        expect(response).to redirect_to(root_path)
+        expect(other_account.reload.name).to eq('Victim')
       end
 
       it 'rejects changing initial_balance after transactions exist' do
@@ -79,6 +94,14 @@ RSpec.describe 'Accounts', type: :request do
           delete account_path(account)
         end.to change { Account.count }.by(-1)
         expect(response).to redirect_to(accounts_path)
+      end
+
+      it 'does not destroy another user account' do
+        other_account = create(:user).accounts.create!(name: 'Keep', account_type: 'bank', initial_balance: 0)
+        expect do
+          delete account_path(other_account)
+        end.not_to change { Account.count }
+        expect(response).to redirect_to(root_path)
       end
     end
   end

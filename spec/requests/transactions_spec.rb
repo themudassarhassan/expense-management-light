@@ -105,6 +105,23 @@ RSpec.describe 'Transactions', type: :request do
         end.to change { user.reload.transactions.count }.by(1)
         expect(response).to redirect_to(transactions_path)
       end
+
+      it 'rejects debit or credit accounts that belong to another user' do
+        other = create(:user)
+        other_bank = other.accounts.create!(name: 'Other bank', account_type: 'bank', initial_balance: 0)
+        expect do
+          post transactions_path, params: {
+            transaction: {
+              amount: 10,
+              transaction_type: 'expense',
+              transaction_date: Date.current,
+              credit_account_id: other_bank.id,
+              debit_account_id: expense.id
+            }
+          }
+        end.not_to change { Transaction.count }
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
     end
 
     describe 'GET /transactions/:id/edit' do
@@ -119,6 +136,22 @@ RSpec.describe 'Transactions', type: :request do
         )
         get edit_transaction_path(t)
         expect(response).to have_http_status(:ok)
+      end
+
+      it 'does not load another user transaction' do
+        other = create(:user)
+        other_bank = other.accounts.create!(name: 'OB', account_type: 'bank', initial_balance: 0)
+        other_exp = other.accounts.create!(name: 'OE', account_type: 'expense', initial_balance: 0)
+        t = create(
+          :transaction,
+          user: other,
+          debit_account: other_exp,
+          credit_account: other_bank,
+          amount: 50,
+          transaction_date: Date.current
+        )
+        get edit_transaction_path(t)
+        expect(response).to redirect_to(root_path)
       end
 
       it_behaves_like 'a request to edit a missing record' do
@@ -148,6 +181,30 @@ RSpec.describe 'Transactions', type: :request do
         expect(response).to redirect_to(transactions_path)
         expect(t.reload.amount).to eq(9.5)
       end
+
+      it 'does not update another user transaction' do
+        other = create(:user)
+        other_bank = other.accounts.create!(name: 'OB', account_type: 'bank', initial_balance: 0)
+        other_exp = other.accounts.create!(name: 'OE', account_type: 'expense', initial_balance: 0)
+        t = create(
+          :transaction,
+          user: other,
+          debit_account: other_exp,
+          credit_account: other_bank,
+          amount: 50,
+          transaction_date: Date.current
+        )
+        patch transaction_path(t), params: {
+          transaction: {
+            amount: 1,
+            credit_account_id: other_bank.id,
+            debit_account_id: other_exp.id,
+            transaction_date: Date.current
+          }
+        }
+        expect(response).to redirect_to(root_path)
+        expect(t.reload.amount).to eq(50)
+      end
     end
 
     describe 'DELETE /transactions/:id' do
@@ -163,6 +220,22 @@ RSpec.describe 'Transactions', type: :request do
         )
         expect { delete transaction_path(t) }.to change { Transaction.count }.by(-1)
         expect(response).to redirect_to(transactions_path)
+      end
+
+      it 'does not destroy another user transaction' do
+        other = create(:user)
+        other_bank = other.accounts.create!(name: 'OB', account_type: 'bank', initial_balance: 0)
+        other_exp = other.accounts.create!(name: 'OE', account_type: 'expense', initial_balance: 0)
+        t = create(
+          :transaction,
+          user: other,
+          debit_account: other_exp,
+          credit_account: other_bank,
+          amount: 1,
+          transaction_date: Date.current
+        )
+        expect { delete transaction_path(t) }.not_to change { Transaction.count }
+        expect(response).to redirect_to(root_path)
       end
     end
   end

@@ -5,6 +5,6 @@ FactoryBot.define do
     amount { 100 }
     budget_month { Date.current.beginning_of_month }
     user
-    account { association :account, user: }
+    account { association :account, user:, account_type: 'expense', initial_balance: 0 }
   end
 end
