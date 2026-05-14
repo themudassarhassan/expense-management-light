@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+# Pre-deploy: run production DB migrations on the active containers and register a deploy in Sentry.
+# `.kamal/hooks/pre-deploy` is sourced with secrets from `.kamal/secrets` (same convention as Kamal).
+#
+# See: https://kamal-deploy.org/docs/hooks/overview
+
+set -euo pipefail
+
+if [[ "${KAMAL_COMMAND:-}" != "deploy" ]]; then
+  exit 0
+fi
+
+HOOK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${HOOK_DIR}/../.." && pwd)"
+cd "${REPO_ROOT}"
+
+set -a
+# shellcheck disable=SC1091
+source "${REPO_ROOT}/.kamal/secrets"
+set +a
+
+echo "[pre-deploy] Running db:migrate on running app containers (skipped if unavailable)..."
+if ! kamal app exec --reuse -- "bin/rails db:migrate"; then
+  echo "[pre-deploy] db:migrate failed or app is not reachable yet — common before the first boot; continuing deploy." >&2
+fi
+
+if [[ -z "${SENTRY_AUTH_TOKEN:-}" || -z "${SENTRY_ORG_SLUG:-}" || -z "${SENTRY_PROJECT_SLUG:-}" ]]; then
+  echo "[pre-deploy] Sentry deploy skipped (missing SENTRY_AUTH_TOKEN, SENTRY_ORG_SLUG, or SENTRY_PROJECT_SLUG)." >&2
+  exit 0
+fi
+
+SENTRY_HOST="${SENTRY_HOST:-https://sentry.io}"
+VERSION="${KAMAL_VERSION:-$(git rev-parse HEAD)}"
+
+echo "[pre-deploy] Notifying Sentry (release ${VERSION})..."
+
+RELEASE_JSON="$(
+export VERSION="${VERSION}"
+export SENTRY_PROJECT_SLUG="${SENTRY_PROJECT_SLUG}"
+ruby -r json - <<'RUBY'
+print JSON.generate(version: ENV.fetch("VERSION"), projects: [ENV.fetch("SENTRY_PROJECT_SLUG")])
+RUBY
+)"
+
+curl -sS -f -X POST "${SENTRY_HOST}/api/0/organizations/${SENTRY_ORG_SLUG}/releases/" \
+  -H "Authorization: Bearer ${SENTRY_AUTH_TOKEN}" \
+  -H "Content-Type: application/json" \
+  -d "${RELEASE_JSON}"
+
+curl -sS -f -X POST "${SENTRY_HOST}/api/0/organizations/${SENTRY_ORG_SLUG}/releases/${VERSION}/deploys/" \
+  -H "Authorization: Bearer ${SENTRY_AUTH_TOKEN}" \
+  -H "Content-Type: application/json" \
+  -d '{"environment":"production"}'
+
+echo "[pre-deploy] Sentry deploy notification complete."

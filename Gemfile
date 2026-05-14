@@ -52,6 +52,12 @@ gem 'tzinfo-data', platforms: %i[windows jruby]
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', require: false
 
+group :production do
+  # Error tracking and tracing (requires SENTRY_DSN in production)
+  gem 'sentry-rails'
+  gem 'sentry-ruby'
+end
+
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 # gem "image_processing", "~> 1.2"
 
