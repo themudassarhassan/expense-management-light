@@ -105,7 +105,6 @@ accessories:
         LOG_SHIP_CONTAINER_NAME_SUBSTRING: expense-tracker
       secret:
         - PROMETHEUS_REMOTE_WRITE_URL
-        - LOKI_PUSH_URL
         - GRAFANA_CLOUD_METRICS_INSTANCE_ID
         - GRAFANA_CLOUD_LOGS_INSTANCE_ID
         - GRAFANA_CLOUD_API_KEY
