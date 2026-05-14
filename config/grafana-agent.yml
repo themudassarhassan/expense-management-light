@@ -1,0 +1,30 @@
+# Grafana Agent (static mode) ships host metrics via remote_write (Grafana Cloud Prometheus)
+# and container logs discovered from the Docker daemon to Grafana Cloud Loki.
+#
+# Credentials and endpoints are supplied as container environment variables by Kamal
+# (from .kamal/secrets). Start the agent with -config.expand-env=true (see deploy.yml).
+#
+# Grafana Cloud: copy remote write URL + Loki push URL from Hosted metrics / Hosted logs setup.
+# Basic-auth username differs per product (Hosted metrics ID vs Hosted logs ID on the Alloy/onboarding snippet).
+# Password is one Cloud Access Policy token with metrics:write and logs:write.
+
+server:
+  log_level: info
+
+metrics:
+  global:
+    scrape_interval: 30s
+    remote_write:
+      - url: ${PROMETHEUS_REMOTE_WRITE_URL}
+        basic_auth:
+          username: ${GRAFANA_CLOUD_METRICS_INSTANCE_ID}
+          password: ${GRAFANA_CLOUD_API_KEY}
+  wal_directory: /tmp/grafana-agent/metrics-wal
+  configs:
+    - name: integrations
+      scrape_configs:
+        - job_name: node_exporter
+          static_configs:
+            - targets:
+                - 127.0.0.1:9100
+          metrics_path: /metrics

@@ -7,7 +7,7 @@ image: themudassar/expense-tracker
 # Deploy to these servers.
 servers:
   web:
-    - 31.97.222.102
+    - &primary_host 31.97.222.102
   # job:
   #   hosts:
   #     - 192.168.0.1
@@ -44,8 +44,8 @@ builder:
 # Inject ENV variables into containers (secrets come from .kamal/secrets).
 #
 env:
-#   clear:
-#     DB_HOST: 192.168.0.2
+  clear:
+    GIT_SHA: "<%= `git rev-parse HEAD`.strip %>"
   secret:
     - RAILS_MASTER_KEY
 
@@ -77,26 +77,34 @@ asset_path: /rails/public/assets
 #   limit: 10 # Can also specify as a percentage of total hosts, such as "25%"
 #   wait: 2
 
-# Use accessory services (secrets come from .kamal/secrets).
-#
-# accessories:
-#   db:
-#     image: mysql:8.0
-#     host: 192.168.0.2
-#     port: 3306
-#     env:
-#       clear:
-#         MYSQL_ROOT_HOST: '%'
-#       secret:
-#         - MYSQL_ROOT_PASSWORD
-#     files:
-#       - config/mysql/production.cnf:/etc/mysql/my.cnf
-#       - db/production.sql:/docker-entrypoint-initdb.d/setup.sql
-#     directories:
-#       - data:/var/lib/mysql
-#   redis:
-#     image: valkey/valkey:8
-#     host: 192.168.0.2
-#     port: 6379
-#     directories:
-#       - data:/data
+accessories:
+  node_exporter:
+    image: prom/node-exporter:v1.8.2
+    host: *primary_host
+    port: "127.0.0.1:9100:9100"
+    cmd: "--path.rootfs=/host"
+    volumes:
+      - "/:/host:ro,rslave"
+    options:
+      pid: host
+
+  grafana_agent:
+    image: grafana/grafana-agent:v0.40.5
+    host: *primary_host
+    cmd: "run -config.file=/etc/grafana-agent/grafana-agent.yml -config.expand-env=true -server.http.address=127.0.0.1:12345"
+    files:
+      - config/grafana-agent.yml:/etc/grafana-agent/grafana-agent.yml:ro
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    options:
+      # Host network reaches Node Exporter when it binds to 127.0.0.1 on the VPS (containers on a
+      # bridge cannot rely on host.docker.internal to hit host loopback-published ports reliably).
+      network: host
+    env:
+      clear:
+        LOG_SHIP_CONTAINER_NAME_SUBSTRING: expense-tracker
+      secret:
+        - PROMETHEUS_REMOTE_WRITE_URL
+        - GRAFANA_CLOUD_METRICS_INSTANCE_ID
+        - GRAFANA_CLOUD_LOGS_INSTANCE_ID
+        - GRAFANA_CLOUD_API_KEY
